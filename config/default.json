@@ -3,7 +3,7 @@
         "host": "46.30.42.225",
         "port": "3306",
         "database": "platformer",
-        "user": "root",
+        "username": "root",
         "password": "root"
     },
     "server": {

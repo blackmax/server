@@ -1,9 +1,10 @@
-var sq = require("../models");
+var db = require("../models/index.js");
 
 const UserService = function () {
 
     this.GetAllUsers = function () {
-        return sq.user.findAll();
+        
+        return db.users.findAll();
     };
 
     return this;
