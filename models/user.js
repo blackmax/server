@@ -1,17 +1,16 @@
-const Sequelize = require('sequelize');
 
-var db = require("./db.js");
+module.exports = (sequelize, DataTypes) => {
+    const User = db.sequelize.define('users', {
+        id: {
+            type: Sequelize.INTEGER(10).UNSIGNED,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        token: Sequelize.STRING(32),
+    
+    },{
+        timestamps: false
+    });
 
-const User = db.sequelize.define('users', {
-    id: {
-        type: Sequelize.INTEGER(10).UNSIGNED,
-        primaryKey: true,
-        autoIncrement: true,
-    },
-    token: Sequelize.STRING(32),
-
-},{
-    timestamps: false
-});
-
-module.exports = User;
+    return User;
+}

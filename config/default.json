@@ -1,0 +1,12 @@
+{
+    "database": {
+        "host": "46.30.42.225",
+        "port": "3306",
+        "database": "platformer",
+        "user": "root",
+        "password": "root"
+    },
+    "server": {
+        "port": 3000
+    }
+}

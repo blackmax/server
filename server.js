@@ -1,4 +1,4 @@
-var user = require('./services/user_services.js');
+const user = require('./services/user_services.js');
 
 var net = require('net');
 

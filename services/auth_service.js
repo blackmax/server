@@ -1,9 +1,9 @@
-var userModel = require("../models/user");
+var sq = require("../models");
 
 
 class GameCenterAuthProvider{
     getUsers(data) {
-        return userModel.findAll({
+        return sq.user.findAll({
             where: {
                 google_play: data.key
             }
@@ -28,7 +28,7 @@ class GameCenterAuthProvider{
 
 class DBAuthProvider{
     getUsers(data) {
-        return userModel.findAll({
+        return sq.user.findAll({
             where: {
                 token: data.token
             }
@@ -41,7 +41,7 @@ class DBAuthProvider{
     }
 
     async checkUserAuth(data){
-        const user = await userModel.find({
+        const user = await sq.user.find({
             where: {
                 token: data.token,
                 id: data.id,
@@ -84,7 +84,7 @@ class AuthService {
 
     async setUser(userId) {
         const key = this.generateKey(32);
-        const user = userModel.findById(userId);
+        const user = sq.user.findById(userId);
         user.token = userId + "." + key;
         await user.save();
 
