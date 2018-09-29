@@ -10,7 +10,6 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     host: config.host,
     dialect: 'mysql',
     operatorsAliases: false,
-
     pool: {
         max: 5,
         min: 0,
@@ -18,6 +17,16 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
         idle: 10000
     },
 });
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+    console.error('Used config \n', config);
+  });
 
 fs
     .readdirSync(__dirname)

@@ -13,10 +13,7 @@ server.on('connection', function(sock) {
 
     sock.on('data', function (buffer) {
         const message = new MessageParser(buffer.toString());
-        message.executeCommand()
-            .then(data => {
-               //send data to user;
-            });
+        message.executeCommand().then(data => SocketIO.write(Buffer.from(data)));
     });
 
     sock.on('close', function () {
