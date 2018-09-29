@@ -4,10 +4,11 @@ class MessageParser {
     constructor(message) {
         //decoding message
         this.data = this.decodeMessage(message);
+        console.log("message: \n", this.data);
     }
 
     decodeMessage(message) {
-        return JSON.decode(message);
+        return message;
     }
 
     getAction() {
