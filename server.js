@@ -1,4 +1,5 @@
 const user = require('./services/user_services.js');
+const MessageParser = require('../websocket_services/message_parser');
 
 var net = require('net');
 const {host, port} = require('config').get('server');
