@@ -92,7 +92,7 @@ class AuthService {
     }
 
     async checkUserAuth(credentials, service){
-        const provider = getAuthProvider(service):
+        const provider = getAuthProvider(service);
         const user = await provider.checkUserAuth(credentials);
         return user;
     }
