@@ -1,5 +1,6 @@
 const user = require('./services/user_services.js');
 const MessageParser = require('./websocket_services/message_parser');
+const db = require('./models/index');
 
 var net = require('net');
 const {host, port} = require('config').get('server');
@@ -14,6 +15,15 @@ server.on('connection', function(sock) {
 
     sock.on('data', function (buffer) {
         const message = new MessageParser(buffer.toString());
+        user().GetAllUsers().then(function (users) {
+            users.map(function (user) {
+                console.log(user.token);
+        
+                user.token = 4444;
+                user.save();
+        
+            })
+        });
         message.executeCommand().then(data => SocketIO.write(Buffer.from(data)));
     });
 
@@ -37,14 +47,4 @@ server.on('connection', function(sock) {
 
 server.on('listening', function () {
     console.log('Server listening on ' + server.address().address + ':' + server.address().port);
-});
-
-user().GetAllUsers().then(function (users) {
-    users.map(function (user) {
-        console.log(user.token);
-
-        user.token = 4444;
-        user.save();
-
-    })
 });
