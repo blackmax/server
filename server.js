@@ -1,12 +1,10 @@
 const user = require('./services/user_services.js');
 
 var net = require('net');
-
-var HOST = 'localhost';
-var PORT = 7777;
+const {host, port} = require('config').get('server');
 
 var server = net.createServer();
-server.listen(PORT, HOST);
+server.listen(port, host);
 
 server.on('connection', function(sock) {
     //sock.setTimeout(3000);

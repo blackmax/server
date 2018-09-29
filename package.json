@@ -6,7 +6,8 @@
   "dependencies": {
     "config": "^2.0.1",
     "mysql2": "^1.6.1",
-    "sequelize": "^4.39.0"
+    "sequelize": "^4.39.0",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {},
   "scripts": {
