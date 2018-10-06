@@ -7,10 +7,14 @@
         "password": "w123456"
     },
     "server": {
+        "port": 3080,
+        "host": "localhost"
+    },
+    "socket": {
         "port": 3000,
         "host": "localhost"
     },
     "logs":  {
-        "level":  "info",
+        "level":  "info"
     }
 }
