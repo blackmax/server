@@ -8,10 +8,8 @@
     "mysql2": "^1.6.1",
     "sequelize": "^4.39.0",
     "socket.io": "^2.1.1",
-    "express": "^4.16.3",
     "winston": "^3.1.0",
-    "pm2": "^3.2.2",
-    "winston-transport-sequelize": "^3.0.1"
+    "pm2": "^3.2.2"
   },
   "devDependencies": {},
   "scripts": {
