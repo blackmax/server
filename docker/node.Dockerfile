@@ -1,8 +1,12 @@
 # Docker-файл контейнера, который загружает зависимости остальных проектов
-FROM node:9-alpine
+FROM node:9
 
-RUN apk update && apk add g++ make python git bash && npm i npm@latest -g
+#RUN apk update && apk add g++ make python git bash && npm i npm@latest -g
 
 WORKDIR /opt/project
 
-CMD rm -fRv node_modules && npm cache verify && npm install && npm ls&& npm audit && node ./server.js
+COPY . .
+
+RUN npm cache verify && npm install
+
+CMD ./node_modules/.bin/pm2-runtime process.yml

@@ -8,3 +8,4 @@ services:
       - "./:/opt/project"
     ports:
       - 3000:3000
+      - 3080:3080

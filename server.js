@@ -1,21 +1,16 @@
-const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const config = require('config').get('server');
+const socket = require('config').get('socket');
+const logger = require('./logger');
+const createUserBus = require('./websocket_services/socket_bus');
 
-app.get('/ping', function (req, res) {
-    res.send('pong');
+const io = require('socket.io')({
+    transports: ['websocket'],
 });
 
-http.listen(config.port, function () {
-    console.log('listening on *:3000');
+io.attach(socket.port, function () {
+    logger.info("socket started at port " + socket.port);
 });
 
 io.on('connection', function (socket) {
-    console.log('user connected');
-
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    })
+    logger.info("user connected");
+    const userBus = createUserBus({logger, socket});
 });
-
