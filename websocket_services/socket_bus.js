@@ -1,3 +1,5 @@
+const {EMITS} = require('./const');
+
 const events = {
     message: ctx => {
         ctx.logger.info(data);
@@ -9,8 +11,8 @@ const events = {
             resolve()
         }, 2000);
     }),
-    super_event: ctx => {
-        ctx.socket.emit("super_event", {foo: "bar"})
+    super_event: async ctx => {
+        ctx.socket.emit(EMITS.PROFILE, await ctx.db.users.all())
     }
 };
 
