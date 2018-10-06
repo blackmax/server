@@ -8,15 +8,18 @@ const events = {
             ctx.logger.info("resolving");
             resolve()
         }, 2000);
-    })
+    }),
+    super_event: ctx => {
+        ctx.socket.emit("super_event", {foo: "bar"})
+    }
 };
 
 module.exports = (ctx) => {
     Object.keys(events).forEach(key => ctx.socket.on(key, async (data) => {
         const parsedData = JSON.parse(data);
-        ctx.logger.info(`[${key}]  message received`);
+        ctx.logger.info({message: `message received`, socketId: ctx.socket.id, event: key});
         ctx.logger.debug(`received data: \n${data}`);
         await events[key]({...ctx, action: key, events, data: parsedData});
-        ctx.logger.info(`[${key}] message handled`);
+        ctx.logger.info({message: `message handled`, socketId: ctx.socket.id, event: key});
     }));
 };
