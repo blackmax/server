@@ -1,0 +1,10 @@
+version: '3'
+services:
+  node:
+    build:
+      context: ./docker
+      dockerfile: node.Dockerfile
+    volumes:
+      - "./:/opt/project"
+    ports:
+      - 3000:3000

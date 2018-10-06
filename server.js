@@ -1,50 +1,21 @@
-const user = require('./services/user_services.js');
-const MessageParser = require('./websocket_services/message_parser');
-const db = require('./models/index');
+const app = require('express')();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const config = require('config').get('server');
 
-var net = require('net');
-const {host, port} = require('config').get('server');
-
-var server = net.createServer();
-server.listen(port, host);
-
-server.on('connection', function(sock) {
-    //sock.setTimeout(3000);
-    console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
-    sock.write("TCP sending message : l");
-
-    sock.on('data', function (buffer) {
-        const message = new MessageParser(buffer.toString());
-        user().GetAllUsers().then(function (users) {
-            users.map(function (user) {
-                console.log(user.token);
-        
-                user.token = 4444;
-                user.save();
-        
-            })
-        });
-        message.executeCommand().then(data => SocketIO.write(Buffer.from(data)));
-    });
-
-    sock.on('close', function () {
-        console.log("CLOSE!");
-    });
-
-    sock.on('end', function () {
-        console.log("END!");
-    });
-
-    sock.on('timeout', function () {
-        console.log("TimeOut!");
-    });
-
-    sock.on('error', function (error) {
-        console.log(error);
-    });
+app.get('/ping', function (req, res) {
+    res.send('pong');
 });
 
-
-server.on('listening', function () {
-    console.log('Server listening on ' + server.address().address + ':' + server.address().port);
+http.listen(config.port, function () {
+    console.log('listening on *:3000');
 });
+
+io.on('connection', function (socket) {
+    console.log('user connected');
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    })
+});
+
