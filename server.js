@@ -13,5 +13,5 @@ io.attach(socket.port, function () {
 
 io.on('connection', function (socket) {
     logger.info("user connected");
-    const userBus = createUserBus({logger, socket, db});
+    const userBus = createUserBus({logger, socket, db, io});
 });
