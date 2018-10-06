@@ -1,7 +1,9 @@
 const loginCommand = require('./commands/login_command');
+const registerCommand = require('./commands/register');
 
 const events = {
-    super_event: loginCommand
+    super_event: loginCommand,
+    register: registerCommand
 };
 
 module.exports = (ctx) => {

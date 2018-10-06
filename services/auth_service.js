@@ -71,6 +71,9 @@ const getAuthProvider = (provider) => {
 };
 
 class AuthService {
+    constructor(db){
+        this.db = db;
+    }
 
     generateKey(length){
         let text = "";
@@ -103,6 +106,5 @@ class AuthService {
     }
 }
 
-const authService = new AuthService();
 
-module.exports = authService;
+module.exports = db => new AuthService(db);
