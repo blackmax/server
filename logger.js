@@ -1,7 +1,8 @@
 const winston = require('winston');
+const config = require('config').get('logger');
 
 const logger = winston.createLogger({
-    level: 'info',
+    level: config.level,
     format: winston.format.json(),
     transports: [
         //
@@ -10,7 +11,13 @@ const logger = winston.createLogger({
         //
         new winston.transports.File({filename: 'error.log', level: 'error'}),
         new winston.transports.File({filename: 'combined.log'})
-    ]
+    ],
+    console: {
+        level: 'debug',
+        handleExceptions: true,
+        json: false,
+        colorize: true,
+    },
 });
 
 //
@@ -19,7 +26,10 @@ const logger = winston.createLogger({
 //
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
-        format: winston.format.simple()
+        format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+        )
     }));
 }
 

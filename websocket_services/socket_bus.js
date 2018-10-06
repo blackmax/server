@@ -13,9 +13,10 @@ const events = {
 
 module.exports = (ctx) => {
     Object.keys(events).forEach(key => ctx.socket.on(key, async (data) => {
-        ctx.logger.info("handling socket message " + key + ":");
-        data && ctx.logger.info(data);
-        await events[key]({...ctx, action: key, events, data});
-        ctx.logger.info("handling finished " + key)
+        const parsedData = JSON.parse(data);
+        ctx.logger.info(`[${key}]  message received`);
+        ctx.logger.debug(`received data: \n${data}`);
+        await events[key]({...ctx, action: key, events, data: parsedData});
+        ctx.logger.info(`[${key}] message handled`);
     }));
 };
