@@ -16,8 +16,9 @@ module.exports = (ctx) => {
         ctx.logger.info({message: `message received`, socketId: ctx.socket.id, event: key});
         ctx.logger.debug(`received data: ${data}`);
         console.time("handle time");
-        const parsedData = JSON.parse(data);
         try {
+            const parsedData = JSON.parse(data);
+
             await events[key]({
                 ...ctx,
                 services: services({...ctx, data: parsedData}),
