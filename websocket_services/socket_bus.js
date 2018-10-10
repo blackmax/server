@@ -20,8 +20,11 @@ module.exports = (ctx) => {
         ctx.logger.debug(`received data: ${data}`);
         console.time("handle time");
         try {
-            const parsedData = JSON.parse(data);
-
+            try {
+                const parsedData = JSON.parse(data);
+            } catch (e) {
+                const parsedData = data;
+            }
             if (parsedData.token) {
                 await ctx.services.user.loadUserByToken(parsedData.token);
             }
@@ -34,10 +37,9 @@ module.exports = (ctx) => {
             });
         } catch (e) {
             ctx.logger.error(e.toString());
-            ctx.socket.emit('_' +
-                'error', e.toString());
+            ctx.socket.emit('_error', e.toString());
         }
-        console.timeEnd("handle time");
         ctx.logger.info({message: `message handled`, socketId: ctx.socket.id, event: key});
+        console.timeEnd("handle time");
     }));
 };
