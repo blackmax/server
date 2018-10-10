@@ -2,7 +2,7 @@ const loginCommand = require('./commands/login_command');
 const registerCommand = require('./commands/register_command');
 const userCars = require('./commands/user_cars');
 const query = require('./commands/query_command');
-const services = require('./services');
+const services = require('../services');
 
 const events = {
     super_event: loginCommand,
