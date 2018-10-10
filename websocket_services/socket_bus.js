@@ -4,13 +4,15 @@ const userCars = require('./commands/user_cars');
 const query = require('./commands/query_command');
 const services = require('../services');
 const buy_car = require('./commands/buy_car');
+const add_currency = require('./commands/add_currency');
 
 const events = {
     super_event: loginCommand,
     register: registerCommand,
     user_cars: userCars,
     query,
-    buy_car
+    buy_car,
+    add_currency
 };
 
 module.exports = (ctx) => {
@@ -20,10 +22,15 @@ module.exports = (ctx) => {
         console.time("handle time");
         try {
             const parsedData = JSON.parse(data);
+            const userServices = services({...ctx, data: parsedData});
+
+            if(parsedData.token){
+                userServices.user.getUser();
+            }
 
             await events[key]({
                 ...ctx,
-                services: services({...ctx, data: parsedData}),
+                services: userServices,
                 action: key,
                 events,
                 data: parsedData,
