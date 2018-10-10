@@ -20,10 +20,11 @@ module.exports = (ctx) => {
         ctx.logger.debug(`received data: ${data}`);
         console.time("handle time");
         try {
+            let parsedData = {};
             try {
-                const parsedData = JSON.parse(data);
+                parsedData = JSON.parse(data);
             } catch (e) {
-                const parsedData = data;
+                parsedData = data;
             }
             if (parsedData.token) {
                 await ctx.services.user.loadUserByToken(parsedData.token);
