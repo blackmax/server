@@ -49,7 +49,19 @@ class UserService extends Service {
             car_id: carId,
         });
 
+        await this.addLevel().save();
+
         return true;
+    }
+
+    addLevel(){
+        this.user.level += 1;
+        return this;
+    }
+
+    save(){
+        this.user.save();
+        return this;
     }
 }
 
