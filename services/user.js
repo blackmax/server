@@ -16,6 +16,7 @@ class UserService extends Service {
         }
 
         const users = await this.ctx.db.users.findAll({
+            attributes: ['token', 'name_changer', 'level', 'adventure_stars', 'current_icon', 'money', 'event_money', 'bonus_level'],
             where: {token}
         });
 
