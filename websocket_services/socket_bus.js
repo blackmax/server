@@ -22,7 +22,7 @@ module.exports = (ctx) => {
         try {
             try {
                 const parsedData = JSON.parse(data);
-            } catch () {
+            } catch (e) {
                 const parsedData = data;
             }
             if (parsedData.token) {
