@@ -59,6 +59,11 @@ class UserService extends Service {
         return this;
     }
 
+    addMoney(amount){
+        this.user.money += amount;
+        return this;
+    }
+
     save(){
         this.user.save();
         return this;
