@@ -10,5 +10,6 @@ module.exports = (sequelize, {INTEGER, TEXT, STRING, BOOLEAN}) =>
         skin_id: INTEGER(10).UNSIGNED,
         new: BOOLEAN,
     }, {
-        timestamps: false
+        timestamps: false,
+        tableName: 'user_skin'
     });
