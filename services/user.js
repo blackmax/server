@@ -116,8 +116,8 @@ class UserService extends Service {
         }
     }
 
-    save() {
-        this.user.save();
+    async save() {
+        await this.user.save();
         return this;
     }
 }
