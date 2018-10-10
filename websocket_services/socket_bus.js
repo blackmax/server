@@ -3,12 +3,14 @@ const registerCommand = require('./commands/register_command');
 const userCars = require('./commands/user_cars');
 const query = require('./commands/query_command');
 const services = require('../services');
+const buy_car = require('./commands/buy_car');
 
 const events = {
     super_event: loginCommand,
     register: registerCommand,
     user_cars: userCars,
     query,
+    buy_car
 };
 
 module.exports = (ctx) => {
@@ -17,7 +19,7 @@ module.exports = (ctx) => {
         ctx.logger.debug(`received data: ${data}`);
         console.time("handle time");
         try {
-            const parsedData = data;
+            const parsedData = JSON.parse(data);
 
             await events[key]({
                 ...ctx,
