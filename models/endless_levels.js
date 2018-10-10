@@ -3,14 +3,14 @@ module.exports = (sequelize, {INTEGER, TEXT, STRING, BOOLEAN}) =>
         user_id: {
             type: INTEGER(10).UNSIGNED,
             primaryKey: true,
-            autoIncrement: true,
+            autoIncrement: false,
         },
         hills_available: BOOLEAN,
         hills_best_distance: INTEGER,
         desert_available: BOOLEAN,
-        desert_bet_distance: INTEGER,
-        show_available: INTEGER,
-        show_best_distance: INTEGER,
+        desert_best_distance: INTEGER,
+        snow_available: INTEGER,
+        snow_best_distance: INTEGER,
     }, {
         timestamps: false
     });

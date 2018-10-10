@@ -8,10 +8,10 @@ const io = require('socket.io')({
 });
 
 io.attach(socket.port, function () {
-    logger.info("socket started at port " + socket.port);
+    logger.info("Socket started on port: " + socket.port);
 });
 
 io.on('connection', function (socket) {
     logger.info("user connected");
-    const userBus = createUserBus({logger, socket, db, io});
+    userBus = createUserBus({logger, socket, db, io});
 });

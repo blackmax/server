@@ -13,4 +13,4 @@ module.exports = async ({data, db, socket, logger}) => {
 		logger.error(e.toString());
 		socket.emit("error", e.toString());
 	}
-}
+};

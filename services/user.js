@@ -47,7 +47,7 @@ class UserService extends Service {
         this.ctx.db.user_cars.create({
             user_id: user.id,
             car_id: carId,
-        })
+        });
 
         return true;
     }
