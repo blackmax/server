@@ -14,18 +14,32 @@ const events = {
     add_currency
 };
 
+function parseData(incomingData) {
+    switch (typeof incomingData) {
+        // если пришла строка - может быть джсон
+        case 'string':
+            try {
+                //  пытаемся распарсить джсон
+                return JSON.stringify(incomingData)
+            } catch (e) {
+                // если ошибка, значит просто строка
+                return incomingData;
+            }
+        default:
+            // остальные типы возвращаем без изменений
+            return incomingData;
+    }
+}
+
 module.exports = (ctx) => {
     Object.keys(events).forEach(key => ctx.socket.on(key, async (data) => {
         ctx.logger.info({message: `message received`, socketId: ctx.socket.id, event: key});
         ctx.logger.debug(`received data: ${data}`);
         console.time("handle time");
         try {
-            let parsedData = {};
-            try {
-                parsedData = JSON.parse(data);
-            } catch (e) {
-                parsedData = data;
-            }
+            // парсим исходные данные
+            const parsedData = parseData(data);
+
             if (parsedData.token) {
                 await ctx.services.user.loadUserByToken(parsedData.token);
             }
