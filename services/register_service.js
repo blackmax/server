@@ -39,13 +39,14 @@ class RegisterService extends Service {
                 user_cars: [common[0]],
                 user_icons: [common[1]],
                 endless_level: common[2],
-            }
+            };
+
 
             this.ctx.logger.info(`user registered ${JSON.stringify(payload)}`);
 
             return payload;
 
-        } catch(e){
+        } catch (e) {
             this.ctx.logger.error(e.toString());
             throw e;
         }
