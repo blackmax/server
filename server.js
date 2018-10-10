@@ -15,7 +15,7 @@ io.attach(socket.port, function () {
 io.on('connection', function (socket) {
     logger.info("user connected");
     // создаем локальные сервисы в памяти существующие внутри подключения юзера
-    const privateServices = services(logger, socket);
+    const privateServices = services({logger, socket, db});
     // создаем контекст
     const ctx = {logger, socket, db, io, services: privateServices};
     // подключаем всё к событиям

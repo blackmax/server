@@ -16,7 +16,7 @@ module.exports = (sequelize, Types) => {
             user_name: TEXT,
             name_changer: BOOLEAN,
             level: INTEGER,
-            adventure_stats: INTEGER,
+            adventure_stars: INTEGER,
             current_icon: INTEGER,
             money: INTEGER,
             event_money: INTEGER,
