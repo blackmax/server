@@ -6,24 +6,30 @@ class UserService extends Service {
         this.user = false;
     }
 
-    async getUser() {
+    async loadUserByToken(token) {
         if (this.user) {
             return this.user;
         }
 
-        if (!this.ctx.data.token) {
+        if (!token) {
             throw "NO_USER_TOKEN";
         }
 
         const users = await this.ctx.db.users.findAll({
-            where: {token: this.ctx.data.token}
+            where: {token}
         });
 
         if (users.length === 0) {
             throw "NO_USER_WAS_FOUND";
         }
-        this.ctx.logger.info(`set user ${users[0].id} for socket ${this.ctx.socket.id}`);
+
+        this.ctx.logger.info('user loaded', {token, id: users[0].id});
+
         this.user = users[0];
+    }
+
+    async getUser(token) {
+        await this.loadUserByToken(token);
 
         return this.user;
 
@@ -35,7 +41,7 @@ class UserService extends Service {
 
     // Покупка машины
     async buyCar(carId) {
-        const user = await this.getUser();
+        const user = this.user;
         const car = await this.ctx.db.cars.findOne({where: {id: carId}});
 
         // Проверка (есть ли у игрока столько денег?)
@@ -55,44 +61,62 @@ class UserService extends Service {
         return true;
     }
 
-    addLevel(){
+    addLevel() {
         this.user.level += 1;
         return this;
     }
 
     // Сохранение сервисов (google_play, game_center, facebook)
-    setServices(type, token){
-        switch (type){
-            case "google_play": this.user.google_play = token; break;
-            case "game_center": this.user.game_center = token; break;
-            case "facebook": this.user.facebook = token; break;
-            default: throw "SERVICES_ERROR";
+    setServices(type, token) {
+        switch (type) {
+            case "google_play":
+                this.user.google_play = token;
+                break;
+            case "game_center":
+                this.user.game_center = token;
+                break;
+            case "facebook":
+                this.user.facebook = token;
+                break;
+            default:
+                throw "SERVICES_ERROR";
         }
         return this;
     }
 
     // Добавление валюты по типу (money, gold, event)
-    addCurrency(type, amount){
+    addCurrency(type, amount) {
         switch (type) {
-            case "money": this.user.money += amount; break;
-            case "gold": this.user.gold += amount; break;
-            case "event": this.user.event_money += amount; break;
-            default: throw "CURRENCY_ERROR";
+            case "money":
+                this.user.money += amount;
+                break;
+            case "gold":
+                this.user.gold += amount;
+                break;
+            case "event":
+                this.user.event_money += amount;
+                break;
+            default:
+                throw "CURRENCY_ERROR";
         }
         return this;
     }
 
     // Проверка валюты по типу (money, gold, event)
-    checkCurrency(type, price){
+    checkCurrency(type, price) {
         switch (type) {
-            case "money": return this.user.money - price >= 0;
-            case "gold": return this.user.gold - price >= 0;
-            case "event": return this.user.event_money - price >= 0;
-            default: throw "CURRENCY_ERROR";
+            case "money":
+                return this.user.money - price >= 0;
+            case "gold":
+                return this.user.gold - price >= 0;
+            case "event":
+                return this.user.event_money - price >= 0;
+            default:
+                throw "CURRENCY_ERROR";
         }
     }
 
-    save(){
+    save() {
         this.user.save();
         return this;
     }
