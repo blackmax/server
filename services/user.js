@@ -72,10 +72,11 @@ class UserService extends Service {
     /**
      * loading full user profile
      * @param token - token of profile
+     * @param refresh - is need to refresh user in local memory
      */
-    async getFullProfile(token) {
+    async getFullProfile(token, refresh = true) {
         const {cars, endless_levels, icons, parts, skins, user_adventure_levels} = this.ctx.db;
-        return await this.ctx.db.users.findOne({
+        const user = await this.ctx.db.users.findOne({
             where: {token},
             include: [
                 {model: cars},
@@ -86,6 +87,11 @@ class UserService extends Service {
                 {model: user_adventure_levels}
             ]
         });
+
+        if (refresh && (this.user.id === user.id || !this.user)) {
+            this.ctx.logger.info({message: `set user ${this.user.id}`});
+            this.setUser(user);
+        }
 
         return user;
     }
