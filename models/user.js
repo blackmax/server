@@ -39,7 +39,6 @@ module.exports = (sequelize, Types) => {
     );
 
     User.hasOne(EndlessLevels(sequelize, Types), {foreignKey: 'user_id'});
-
     User.hasMany(UserAdventureLevels(sequelize, Types), {foreignKey: 'user_id'});
     User.hasMany(Containers(sequelize, Types), {foreignKey: 'user_id'});
     User.belongsToMany(Car(sequelize, Types), {
@@ -47,19 +46,16 @@ module.exports = (sequelize, Types) => {
         foreignKey: 'user_id',
         otherKey: 'car_id'
     });
-
     User.belongsToMany(Icons(sequelize, Types), {
         through: UserIcons(sequelize, Types),
         foreignKey: 'user_id',
         otherKey: 'icon_id',
     });
-
     User.belongsToMany(Parts(sequelize, Types), {
         through: UserParts(sequelize, Types),
         foreignKey: 'user_id',
         otherKey: 'part_id',
     });
-
     User.belongsToMany(Skins(sequelize, Types), {
         through: UserSkins(sequelize, Types),
         foreignKey: 'user_id',
