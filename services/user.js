@@ -17,7 +17,7 @@ class UserService extends Service {
         }
 
         const users = await this.ctx.db.users.findAll({
-            attributes: ['token', 'name_changer', 'level', 'adventure_stars', 'current_icon', 'money', 'event_money', 'bonus_level'],
+            attributes: ['id', 'token', 'name_changer', 'level', 'adventure_stars', 'current_icon', 'money', 'event_money', 'bonus_level'],
             where: {token}
         });
 
@@ -150,6 +150,21 @@ class UserService extends Service {
         }
 
         return user;
+    }
+
+    async changeIcon(iconId) {
+        // check if icon exists in db
+        const icon = await this.ctx.db.user_icons.findOne({
+            where: {icon_id: iconId}
+        });
+
+        if (!icon) {
+            return false;
+        }
+
+        this.user.current_icon = iconId;
+
+        return true;
     }
 }
 
