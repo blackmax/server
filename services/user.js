@@ -154,6 +154,7 @@ class UserService extends Service {
 }
 
 UserService.publicAttributes = [
+    'id',
     'token',
     'user_name',
     'name_changer',

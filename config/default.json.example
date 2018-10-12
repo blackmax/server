@@ -16,5 +16,14 @@
     },
     "logs":  {
         "level":  "info"
+    },
+    "android": {
+        "version": 0,
+    },
+    "iOS": {
+        "version": 0,
+    },
+    "query": {
+        "public_models": ["cars", "icons", "skins"]
     }
 }

@@ -1,5 +1,7 @@
+const config = require('config').get('query');
+
 module.exports = async ({data, db, socket, logger}) => {
-    const allowedModels = ['cars', 'icons'];
+    const allowedModels = config.public_models;
     logger.debug(`query command for model ${data.model}`);
     if (allowedModels.indexOf(data.model) === -1) {
         logger.error(`rejected model ${data.model}`);
