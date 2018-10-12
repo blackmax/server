@@ -129,16 +129,16 @@ class UserService extends Service {
      * @param refresh - is need to refresh user in local memory
      */
     async getFullProfile(token, refresh = true) {
-        const {cars, endless_levels, icons, parts, skins, user_adventure_levels, containers} = this.ctx.db;
+        const {user_cars, endless_levels, user_icons, user_parts, user_skin, user_adventure_levels, containers} = this.ctx.db;
         const user = await this.ctx.db.users.findOne({
             attributes: UserService.publicAttributes,
             where: {token},
             include: [
-                {model: cars},
+                {model: user_cars},
                 {model: endless_levels},
-                {model: icons},
-                {model: parts},
-                {model: skins},
+                {model: user_icons},
+                {model: user_parts},
+                {model: user_skin},
                 {model: user_adventure_levels},
                 {model: containers}
             ]
