@@ -8,6 +8,7 @@ const UserParts = require('./user_parts');
 const EndlessLevels = require('./endless_levels');
 const Skins = require('./skins');
 const UserSkins = require('./user_skin');
+const Containers = require('./containers');
 
 module.exports = (sequelize, Types) => {
     const {INTEGER, TEXT, BOOLEAN, STRING} = Types;
@@ -40,7 +41,7 @@ module.exports = (sequelize, Types) => {
     User.hasOne(EndlessLevels(sequelize, Types), {foreignKey: 'user_id'});
 
     User.hasMany(UserAdventureLevels(sequelize, Types), {foreignKey: 'user_id'});
-
+    User.hasMany(Containers(sequelize, Types), {foreignKey: 'user_id'});
     User.belongsToMany(Car(sequelize, Types), {
         through: UserCars(sequelize, Types),
         foreignKey: 'user_id',
