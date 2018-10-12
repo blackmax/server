@@ -1,6 +1,7 @@
 const Service = require('./service');
 
 class UserService extends Service {
+
     constructor(ctx) {
         super(ctx);
         this.user = false;
@@ -121,6 +122,48 @@ class UserService extends Service {
         await this.user.save();
         return this;
     }
+
+    /**
+     * loading full user profile
+     * @param token - token of profile
+     * @param refresh - is need to refresh user in local memory
+     */
+    async getFullProfile(token, refresh = true) {
+        const {cars, endless_levels, icons, parts, skins, user_adventure_levels, containers} = this.ctx.db;
+        const user = await this.ctx.db.users.findOne({
+            attributes: UserService.publicAttributes,
+            where: {token},
+            include: [
+                {model: cars},
+                {model: endless_levels},
+                {model: icons},
+                {model: parts},
+                {model: skins},
+                {model: user_adventure_levels},
+                {model: containers}
+            ]
+        });
+
+        if (refresh && (this.user.id === user.id || !this.user)) {
+            this.ctx.logger.info({message: `set user ${this.user.id}`});
+            this.setUser(user);
+        }
+
+        return user;
+    }
 }
+
+UserService.publicAttributes = [
+    'token',
+    'user_name',
+    'name_changer',
+    'level',
+    'adventure_stars',
+    'current_icon',
+    'money',
+    'gold',
+    'event_money',
+    'bonus_level',
+];
 
 module.exports = ctx => new UserService(ctx);

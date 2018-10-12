@@ -1,10 +1,19 @@
 const Car = require("./car");
 const UserCars = require("./user_cars");
+const UserAdventureLevels = require('./user_adventure_levels');
+const Icons = require('./icon');
+const UserIcons = require('./user_icons');
+const Parts = require('./parts');
+const UserParts = require('./user_parts');
+const EndlessLevels = require('./endless_levels');
+const Skins = require('./skins');
+const UserSkins = require('./user_skin');
+const Containers = require('./containers');
 
 module.exports = (sequelize, Types) => {
-    const { INTEGER, TEXT, BOOLEAN, STRING} = Types;
+    const {INTEGER, TEXT, BOOLEAN, STRING} = Types;
     const User = sequelize.define('users', {
-            id: { 
+            id: {
                 type: INTEGER(10).UNSIGNED,
                 primaryKey: true,
                 autoIncrement: true,
@@ -23,16 +32,34 @@ module.exports = (sequelize, Types) => {
             bonus_level: BOOLEAN,
             android: BOOLEAN,
             iOS: BOOLEAN
-        }, 
+        },
         {
             timestamps: false
         },
     );
 
+    User.hasOne(EndlessLevels(sequelize, Types), {foreignKey: 'user_id'});
+    User.hasMany(UserAdventureLevels(sequelize, Types), {foreignKey: 'user_id'});
+    User.hasMany(Containers(sequelize, Types), {foreignKey: 'user_id'});
     User.belongsToMany(Car(sequelize, Types), {
-        through: UserCars(sequelize, Types), 
-        foreignKey: 'user_id', 
+        through: UserCars(sequelize, Types),
+        foreignKey: 'user_id',
         otherKey: 'car_id'
+    });
+    User.belongsToMany(Icons(sequelize, Types), {
+        through: UserIcons(sequelize, Types),
+        foreignKey: 'user_id',
+        otherKey: 'icon_id',
+    });
+    User.belongsToMany(Parts(sequelize, Types), {
+        through: UserParts(sequelize, Types),
+        foreignKey: 'user_id',
+        otherKey: 'part_id',
+    });
+    User.belongsToMany(Skins(sequelize, Types), {
+        through: UserSkins(sequelize, Types),
+        foreignKey: 'user_id',
+        otherKey: 'skin_id',
     });
 
     return User

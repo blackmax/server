@@ -2,7 +2,9 @@ const loginCommand = require('./commands/login_command');
 const registerCommand = require('./commands/register_command');
 const userCars = require('./commands/user_cars');
 const query = require('./commands/query_command');
+const services = require('../services');
 const buy_car = require('./commands/buy_car');
+const profile = require("./commands/profile");
 const add_currency = require('./commands/add_currency');
 
 const events = {
@@ -10,6 +12,7 @@ const events = {
     register: registerCommand,
     user_cars: userCars,
     query,
+    profile,
     buy_car,
     add_currency
 };
