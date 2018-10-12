@@ -103,8 +103,6 @@ class UserService extends Service {
         return this;
     }
 
-    save() {
-        this.user.save();
     // Проверка валюты по типу (money, gold, event)
     checkCurrency(type, price) {
         switch (type) {
