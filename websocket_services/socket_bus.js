@@ -4,13 +4,14 @@ const userCars = require('./commands/user_cars');
 const query = require('./commands/query_command');
 const services = require('../services');
 const buy_car = require('./commands/buy_car');
-
+const profile = require("./commands/profile");
 const events = {
     super_event: loginCommand,
     register: registerCommand,
     user_cars: userCars,
     query,
-    buy_car
+    buy_car,
+    profile
 };
 
 module.exports = (ctx) => {

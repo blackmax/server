@@ -54,19 +54,40 @@ class UserService extends Service {
         return true;
     }
 
-    addLevel(){
+    addLevel() {
         this.user.level += 1;
         return this;
     }
 
-    addMoney(amount){
+    addMoney(amount) {
         this.user.money += amount;
         return this;
     }
 
-    save(){
+    save() {
         this.user.save();
         return this;
+    }
+
+    /**
+     * loading full user profile
+     * @param token - token of profile
+     */
+    async getFullProfile(token) {
+        const {cars, endless_levels, icons, parts, skins, user_adventure_levels} = this.ctx.db;
+        return await this.ctx.db.users.findOne({
+            where: {token},
+            include: [
+                {model: cars},
+                {model: endless_levels},
+                {model: icons},
+                {model: parts},
+                {model: skins},
+                {model: user_adventure_levels}
+            ]
+        });
+
+        return user;
     }
 }
 

@@ -10,9 +10,9 @@ const Skins = require('./skins');
 const UserSkins = require('./user_skin');
 
 module.exports = (sequelize, Types) => {
-    const { INTEGER, TEXT, BOOLEAN, STRING} = Types;
+    const {INTEGER, TEXT, BOOLEAN, STRING} = Types;
     const User = sequelize.define('users', {
-            id: { 
+            id: {
                 type: INTEGER(10).UNSIGNED,
                 primaryKey: true,
                 autoIncrement: true,
@@ -24,26 +24,26 @@ module.exports = (sequelize, Types) => {
             user_name: TEXT,
             name_changer: BOOLEAN,
             level: INTEGER,
-            adventure_stats: INTEGER,
+            adventure_stars: INTEGER,
             current_icon: INTEGER,
             money: INTEGER,
             event_money: INTEGER,
             bonus_level: BOOLEAN,
             android: BOOLEAN,
             iOS: BOOLEAN
-        }, 
+        },
         {
             timestamps: false
         },
     );
 
-    User.hasOne(EndlessLevels(sequelize, Types));
+    User.hasOne(EndlessLevels(sequelize, Types), {foreignKey: 'user_id'});
 
-    User.hasMany(UserAdventureLevels(sequelize, Types));
+    User.hasMany(UserAdventureLevels(sequelize, Types), {foreignKey: 'user_id'});
 
     User.belongsToMany(Car(sequelize, Types), {
-        through: UserCars(sequelize, Types), 
-        foreignKey: 'user_id', 
+        through: UserCars(sequelize, Types),
+        foreignKey: 'user_id',
         otherKey: 'car_id'
     });
 
