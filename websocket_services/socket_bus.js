@@ -12,8 +12,7 @@ const events = {
     register: registerCommand,
     user_cars: userCars,
     query,
-    buy_car,
-    profile
+    profile,
     buy_car,
     add_currency
 };
