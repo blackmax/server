@@ -1,6 +1,7 @@
 const Service = require('./service');
 
 class UserService extends Service {
+
     constructor(ctx) {
         super(ctx);
         this.user = false;
@@ -128,8 +129,9 @@ class UserService extends Service {
      * @param refresh - is need to refresh user in local memory
      */
     async getFullProfile(token, refresh = true) {
-        const {cars, endless_levels, icons, parts, skins, user_adventure_levels} = this.ctx.db;
+        const {cars, endless_levels, icons, parts, skins, user_adventure_levels, containers} = this.ctx.db;
         const user = await this.ctx.db.users.findOne({
+            attributes: UserService.publicAttributes,
             where: {token},
             include: [
                 {model: cars},
@@ -137,7 +139,8 @@ class UserService extends Service {
                 {model: icons},
                 {model: parts},
                 {model: skins},
-                {model: user_adventure_levels}
+                {model: user_adventure_levels},
+                {model: containers}
             ]
         });
 
@@ -149,5 +152,18 @@ class UserService extends Service {
         return user;
     }
 }
+
+UserService.publicAttributes = [
+    'token',
+    'user_name',
+    'name_changer',
+    'level',
+    'adventure_stars',
+    'current_icon',
+    'money',
+    'gold',
+    'event_money',
+    'bonus_level',
+];
 
 module.exports = ctx => new UserService(ctx);
