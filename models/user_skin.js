@@ -11,5 +11,5 @@ module.exports = (sequelize, {INTEGER, TEXT, STRING, BOOLEAN}) =>
         new: BOOLEAN,
     }, {
         timestamps: false,
-        tableName: 'user_skin',
+        tableName: 'user_skin'
     });

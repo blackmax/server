@@ -8,7 +8,6 @@ class GameCenterAuthProvider{
                 google_play: data.key
             }
         });
-
     }
     async auth(data) {
         const users = await this.getUsers(data);
