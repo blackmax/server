@@ -1,5 +1,13 @@
 const Car = require("./car");
 const UserCars = require("./user_cars");
+const UserAdventureLevels = require('./user_adventure_levels');
+const Icons = require('./icon');
+const UserIcons = require('./user_icons');
+const Parts = require('./parts');
+const UserParts = require('./user_parts');
+const EndlessLevels = require('./endless_levels');
+const Skins = require('./skins');
+const UserSkins = require('./user_skin');
 
 module.exports = (sequelize, Types) => {
     const { INTEGER, TEXT, BOOLEAN, STRING} = Types;
@@ -29,10 +37,32 @@ module.exports = (sequelize, Types) => {
         },
     );
 
+    User.hasOne(EndlessLevels(sequelize, Types));
+
+    User.hasMany(UserAdventureLevels(sequelize, Types));
+
     User.belongsToMany(Car(sequelize, Types), {
         through: UserCars(sequelize, Types), 
         foreignKey: 'user_id', 
         otherKey: 'car_id'
+    });
+
+    User.belongsToMany(Icons(sequelize, Types), {
+        through: UserIcons(sequelize, Types),
+        foreignKey: 'user_id',
+        otherKey: 'icon_id',
+    });
+
+    User.belongsToMany(Parts(sequelize, Types), {
+        through: UserParts(sequelize, Types),
+        foreignKey: 'user_id',
+        otherKey: 'part_id',
+    });
+
+    User.belongsToMany(Skins(sequelize, Types), {
+        through: UserSkins(sequelize, Types),
+        foreignKey: 'user_id',
+        otherKey: 'skin_id',
     });
 
     return User
