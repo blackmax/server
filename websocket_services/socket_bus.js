@@ -20,7 +20,7 @@ function parseData(incomingData) {
         case 'string':
             try {
                 //  пытаемся распарсить джсон
-                return JSON.stringify(incomingData)
+                return JSON.parse(incomingData)
             } catch (e) {
                 // если ошибка, значит просто строка
                 return incomingData;

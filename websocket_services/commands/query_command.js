@@ -1,6 +1,6 @@
 module.exports = async ({data, db, socket, logger}) => {
     const allowedModels = ['cars', 'icons'];
-
+    logger.debug(`query command for model ${data.model}`);
     if (allowedModels.indexOf(data.model) === -1) {
         logger.error(`rejected model ${data.model}`);
         socket.emit('_error', {error: 'REJECTED_MODEL'});
@@ -22,7 +22,7 @@ module.exports = async ({data, db, socket, logger}) => {
     socket.emit("query", {
         model,
         attributes,
-        data: dbData,
+        [data.model]: dbData,
     });
 
     return true;
