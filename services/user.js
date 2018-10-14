@@ -8,7 +8,7 @@ class UserService extends Service {
     }
 
     async loadUserByToken(token) {
-        if (this.user) {
+        if (this.user.token === token) {
             return this.user;
         }
 
@@ -39,28 +39,6 @@ class UserService extends Service {
 
     setUser(user) {
         this.user = user;
-    }
-
-    // Покупка машины
-    async buyCar(carId) {
-        const user = this.user;
-        const car = await this.ctx.db.cars.findOne({where: {id: carId}});
-
-        // Проверка (есть ли у игрока столько денег?)
-        if (!this.checkCurrency("money", car.price)) {
-            throw "NOT_ENOUGH_CURRENCY";
-        }
-
-        // Созд
-        await this.ctx.db.user_cars.create({
-            user_id: user.id,
-            car_id: carId,
-        });
-
-
-        await this.addLevel().save();
-
-        return true;
     }
 
     addLevel() {
@@ -102,20 +80,6 @@ class UserService extends Service {
                 throw "CURRENCY_ERROR";
         }
         return this;
-    }
-
-    // Проверка валюты по типу (money, gold, event)
-    checkCurrency(type, price) {
-        switch (type) {
-            case "money":
-                return this.user.money - price >= 0;
-            case "gold":
-                return this.user.gold - price >= 0;
-            case "event":
-                return this.user.event_money - price >= 0;
-            default:
-                throw "CURRENCY_ERROR";
-        }
     }
 
     async save() {
