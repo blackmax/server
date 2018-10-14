@@ -9,7 +9,7 @@ module.exports = (sequelize, {INTEGER, TEXT, STRING, BOOLEAN}) =>
         hills_best_distance: INTEGER,
         desert_available: BOOLEAN,
         desert_best_distance: INTEGER,
-        snow_available: INTEGER,
+        snow_available: BOOLEAN,
         snow_best_distance: INTEGER,
     }, {
         timestamps: false
