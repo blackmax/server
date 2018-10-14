@@ -7,9 +7,10 @@ class CarService extends Service {
         if (!skin) {
             return false;
         }
+        const field = skin.type === 'body' ? 'skin_id' : 'disk_id';
 
         const userCar = await user_cars.update({
-            skin_id: skinId,
+            [field]: skinId,
         }, {
             where: {
                 user_id: userId,
