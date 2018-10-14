@@ -17,11 +17,8 @@
     "logs":  {
         "level":  "info"
     },
-    "android": {
-        "version": 0
-    },
-    "iOS": {
-        "version": 0
+    "client": {
+        "version": "0.1.1"
     },
     "query": {
         "public_models": ["cars", "icons", "skins"]

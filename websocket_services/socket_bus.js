@@ -7,6 +7,7 @@ const buy_car = require('./commands/buy_car');
 const profile = require("./commands/profile");
 const add_currency = require('./commands/add_currency');
 const icon_changed = require('./commands/icon_changed');
+const status = require('./commands/status');
 
 const events = {
     super_event: loginCommand,
@@ -17,6 +18,7 @@ const events = {
     buy_car,
     add_currency,
     icon_changed,
+    status
 };
 
 function parseData(incomingData) {
