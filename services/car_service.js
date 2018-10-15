@@ -58,6 +58,50 @@ class CarService extends Service {
         ]);
         return true;
     }
+
+    /**
+     * сколько денег надо на следующий апгрейд
+     * @param from
+     * @param level
+     * @returns {*}
+     */
+    getUpgradePrice(from, level) {
+        const half = from / 2;
+        let price = from;
+        for (let i = 2; i < level + 1; i++) {
+            price += half + 100 * (i - 2);
+        }
+
+        return price;
+    }
+
+    async upgradeCar(user, carId, type) {
+        const {cars, user_cars} = this.ctx.db;
+        const [car, userCar] = await Promise.all([
+            cars.find({where: {id: carId}}),
+            user_cars.find({where: {user_id: user.id, car_id: carId}}),
+        ]);
+
+        if (!userCar || !car) {
+            return false;
+        }
+        const currLevel = userCar[type + "_max"];
+
+        if (!currLevel) {
+            return false;
+        }
+
+        const moneyNeeded = this.getUpgradePrice(car.upgrade_price, currLevel);
+        if (!user.checkCurrency('money', moneyNeeded) && userCar[type + '_max'] + 1 < 20) {
+            return false;
+        }
+        userCar[type + '_max'] += 1;
+        user.addCurrency('money', moneyNeeded * -1);
+
+        await Promise.all([userCar.save(), user.save()]);
+
+        return true;
+    }
 }
 
 module.exports = (ctx) => new CarService(ctx);
