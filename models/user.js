@@ -46,5 +46,38 @@ module.exports = (sequelize, Types) => {
     User.hasMany(UserParts(sequelize, Types), {foreignKey: 'user_id'});
     User.hasMany(UserSkins(sequelize, Types), {foreignKey: 'user_id'});
 
-    return User
+
+    User.prototype.checkCurrency = function (type, price) {
+
+        switch (type) {
+            case "money":
+                return this.money - price >= 0;
+            case "gold":
+                return this.gold - price >= 0;
+            case "event":
+                return this.event_money - price >= 0;
+            default:
+                throw "CURRENCY_ERROR";
+        }
+    };
+
+    User.prototype.addCurrency = function (type, amount) {
+        switch (type) {
+            case "money":
+                this.money += amount;
+                break;
+            case "gold":
+                this.gold += amount;
+                break;
+            case "event":
+                this.event_money += amount;
+                break;
+            default:
+                throw "CURRENCY_ERROR";
+        }
+        return this;
+    };
+
+
+    return User;
 };
