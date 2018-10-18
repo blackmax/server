@@ -21,6 +21,12 @@ class DropService extends Service {
         return item;
     }
 
+    /**
+     * checking criteria and user data for get only uniq, fresh items needed for user
+     * @param criteria - conditions for items
+     * @param userId - id of user
+     * @returns {number|array} - number if gold, array if some model type
+     */
     getItemsForDrop(criteria, userId) {
         switch (criteria.drop_type) {
             case 'gold':
@@ -68,20 +74,22 @@ class DropService extends Service {
         const slotsAvailable = container.slots;
         const droppedItems = {gold: 0};
         while (slotsAvailable) {
-            // берем критерии для группы
+            // get the conditions for current slot
             const slotItems = items.filter(el => el.slot_number === slotsAvailable);
-            // выбираем 1 тип итема
+            // get only one condition for drop
             const item = this.rollItem(slotItems);
-
+            // get a items for drop
             const itemsForDrop = this.getItemsForDrop(item, userId);
-
+            // if no items - get gold
             if (!items) {
                 droppedItems.gold += this.exchangeForGold(item, userId);
                 continue;
             }
-
+            // if we have items - attaching it to current object
             droppedItems[item.drop_type].push(this.rollItem(itemsForDrop, item.min_value, item.max_value));
         }
+
+        return droppedItems
 
     }
 }
