@@ -14,7 +14,7 @@
         "port": 3000,
         "host": "localhost"
     },
-    "logs":  {
+    "logger":  {
         "level":  "info"
     },
     "client": {

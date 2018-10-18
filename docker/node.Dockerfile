@@ -11,4 +11,4 @@ CMD rm -fRv node_modules && npm cache verify && npm install && npm ls&& npm audi
 
 EXPOSE 3000 3080
 
-CMD ./node_modules/.bin/pm2-runtime process.yml
+CMD npm install && ./node_modules/.bin/pm2-runtime process.yml

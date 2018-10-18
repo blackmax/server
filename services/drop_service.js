@@ -38,14 +38,15 @@ class DropService extends Service {
                     where: {id: {[Op.notIn]: userSkins.map(el => el.skin_id)}, rarity: criteria.rarity}
                 });
             default:
-
+                this.ctx.logger.error('NO DROP TYPE HANDLER');
                 break;
         }
     }
 
     exchangeForGold(criteria, userId) {
         switch (criteria.drop_type) {
-
+            case DropService.dropTypes.SKINS:
+                return 600;
         }
     }
 
@@ -76,7 +77,7 @@ class DropService extends Service {
     }
 
     async handleDrop(userId, containerId) {
-        const [container, items] = Promise.all([
+        const [container, items] = await Promise.all([
             this.ctx.db.container_types.find({where: {id: containerId}}),
             this.ctx.db.drop_from_container.findAll({where: {container_id: containerId}}),
         ]);
@@ -110,3 +111,5 @@ DropService.dropTypes = {
 
 
 DropService.dropTypes = [];
+
+module.exports = (ctx) => new DropService(ctx)

@@ -9,6 +9,7 @@ const add_currency = require('./commands/add_currency');
 const icon_changed = require('./commands/icon_changed');
 const status = require('./commands/status');
 const car_skin_changed = require('./commands/car_skin_changed');
+const drop = require('./commands/drop');
 
 const events = {
     super_event: loginCommand,
@@ -20,7 +21,8 @@ const events = {
     add_currency,
     icon_changed,
     status,
-    car_skin_changed
+    car_skin_changed,
+    drop,
 };
 
 function parseData(incomingData) {
@@ -62,6 +64,9 @@ module.exports = (ctx) => {
         } catch (e) {
             ctx.logger.error(e.toString());
             ctx.socket.emit('_error', e.toString());
+            if(process.env.NODE_ENV !== 'PRODUCTION') {
+                throw e;
+            }
         }
         ctx.logger.info({message: `message handled`, socketId: ctx.socket.id, event: key});
         console.timeEnd("handle time");
