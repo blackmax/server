@@ -34,7 +34,7 @@ module.exports = (sequelize, Types) => {
             iOS: BOOLEAN
         },
         {
-            timestamps: false,
+            timestamps: false
         },
     );
 
