@@ -27,10 +27,19 @@ class DropService extends Service {
      * @param userId - id of user
      * @returns {number|array} - number if gold, array if some model type
      */
-    getItemsForDrop(criteria, userId) {
+    async getItemsForDrop(criteria, userId) {
+        const {skins, user_skin} = this.ctx.db;
         switch (criteria.drop_type) {
-            case 'gold':
-                return 0;
+            case DropService.dropTypes.GOLD:
+                return (Math.random() + criteria.min_value) % criteria.max_value;
+            case DropService.dropTypes.SKINS:
+                const userSkins = await user_skin.findAll({where: {user_id: userId}});
+                return await skins.findAll({
+                    where: {id: {[Op.notIn]: userSkins.map(el => el.skin_id)}, rarity: criteria.rarity}
+                });
+            default:
+
+                break;
         }
     }
 
@@ -79,7 +88,7 @@ class DropService extends Service {
             // get only one condition for drop
             const item = this.rollItem(slotItems);
             // get a items for drop
-            const itemsForDrop = this.getItemsForDrop(item, userId);
+            const itemsForDrop = await this.getItemsForDrop(item, userId);
             // if no items - get gold
             if (!items) {
                 droppedItems.gold += this.exchangeForGold(item, userId);
@@ -93,6 +102,11 @@ class DropService extends Service {
 
     }
 }
+
+DropService.dropTypes = {
+    GOLD: 'gold',
+    SKINS: 'skins',
+};
 
 
 DropService.dropTypes = [];
