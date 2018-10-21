@@ -9,8 +9,12 @@ class DropService extends Service {
      * @returns {number}
      */
     randomInteger(min, max) {
+        if (max === 0) {
+            return 0;
+        }
         let rand = min + Math.random() * (max + 1 - min);
         rand = Math.floor(rand);
+
         return rand;
     }
 
@@ -23,8 +27,11 @@ class DropService extends Service {
         const dropZone = Object.keys(criterias).reduce((prev, item) => {
             return prev + item.change;
         });
+        let points = 0;
+        if (dropZone > 0) {
+            points = this.randomInteger(1, dropZone);
+        }
 
-        const points = this.randomInteger(1, dropZone);
 
         return criterias.reduce((prev, item) => {
 
@@ -62,14 +69,18 @@ class DropService extends Service {
                     return items;
                 }
 
-                const droppedItems = {};
+                const droppedItems = [];
 
-                while (Object.keys(droppedItems).length < itemsNeeded) {
+                while (droppedItems.length < itemsNeeded) {
                     const key = this.randomInteger(0, items.length);
                     if (droppedItems[key]) {
                         continue;
                     }
-                    droppedItems[key] = items[key];
+                    const item = items[key];
+                    const isItemExists = droppedItems.find(element => element.id === item.id);
+                    if (!isItemExists) {
+                        droppedItems.push(item);
+                    }
                 }
 
                 return droppedItems;
@@ -165,9 +176,9 @@ class DropService extends Service {
                 continue;
             }
             // if we have items - attaching it to current object
-            droppedItems.slots[slotsAvailable] = {[item.drop_type]: this.rollItem(itemsForDrop, item.drop_type, item.min_value, item.max_value, item.rarity)};
-
-            this.ctx.logger.debug('dropped items', droppedItems);
+            droppedItems.slots[slotsAvailable] = {
+                [item.drop_type]: this.rollItem(itemsForDrop, item.drop_type, item.min_value, item.max_value, item.rarity)
+            };
         }
 
         return droppedItems
