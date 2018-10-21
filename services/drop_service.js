@@ -12,7 +12,7 @@ class DropService extends Service {
         if (max === 0) {
             return 0;
         }
-        let rand = min + Math.random() * (max + 1 - min);
+        let rand = min + Math.random() * (max - min);
         rand = Math.floor(rand);
 
         return rand;
@@ -24,22 +24,18 @@ class DropService extends Service {
      * @returns {*}
      */
     rollType(criterias) {
-        const dropZone = Object.keys(criterias).reduce((prev, item) => {
-            return prev + item.change;
-        });
-        let points = 0;
-        if (dropZone > 0) {
-            points = this.randomInteger(1, dropZone);
+        const dropZone = criterias.reduce((prev, item) => {
+            return prev + item.chance;
+        }, 0);
+
+        let points = this.randomInteger(1, dropZone);
+        this.ctx.logger.debug(`rolling points ${points} out of ${dropZone}`);
+        let iterations = 0;
+        while (points > 0) {
+            points -= criterias[iterations].chance;
+            iterations += 1;
         }
-
-
-        return criterias.reduce((prev, item) => {
-
-            if (prev - item.chance > 0)
-                return prev - item.chance;
-
-            return item;
-        }, points);
+        return criterias[iterations - 1];
     }
 
     /**
@@ -57,6 +53,14 @@ class DropService extends Service {
                 return items;
             case DropService.dropTypes.GOLD:
                 return items;
+            case DropService.dropTypes.PARTS:
+                const count = this.randomInteger(minValue, maxValue);
+                const partNumber = this.randomInteger(0, items.length);
+                items[partNumber].setDataValue('count', count);
+
+                return items[partNumber];
+                //TODO: добавить проверку параметров юзера для количества запчастей
+                //TODO: добавить выборку случайной запчасти из возможных
             default:
                 const itemsNeeded = maxValue - minValue;
                 if (itemsNeeded === 0) {
@@ -102,9 +106,6 @@ class DropService extends Service {
                 return this.randomInteger(criteria.min_value, criteria.max_value);
             case DropService.dropTypes.SKINS:
                 const userSkins = await user_skin.findAll({where: {user_id: userId}});
-                if (!userSkins) {
-                    return await skins.findAll({where: {rarity: criteria.rarity}});
-                }
                 return await skins.findAll({
                     where: {id: {[Op.notIn]: userSkins.map(el => el.skin_id)}, rarity: criteria.rarity}
                 });
@@ -119,6 +120,7 @@ class DropService extends Service {
                 });
                 const userParts = await user_parts.findAll({where: {user_id: userId}});
                 return await parts.findAll({
+                    attributes: ["id", "class", "type", "rarity"],
                     where: {
                         id: {
                             [Op.notIn]: userParts.map(element => element.part_id)
@@ -151,22 +153,26 @@ class DropService extends Service {
             this.ctx.db.containers_types.find({where: {id: containerId}}),
             this.ctx.db.drop_from_container.findAll({where: {container_id: containerId}}),
         ]);
-        let slotsAvailable = container.slots + 1;
+        let slotsAvailable = container.slots;
         let droppedItems = {slots: {}};
-        while (slotsAvailable--) {
+        while (slotsAvailable > 0) {
+            this.ctx.logger.debug(`handling drop for slot ${slotsAvailable}`);
             // get the conditions for current slot
             const slotItems = items.filter(item => item.slot_number === slotsAvailable);
 
+            slotsAvailable -= 1;
+            this.ctx.logger.debug('rolling items', {items: slotItems.map(element => element.drop_type + " " + element.chance)});
             if (slotItems.length === 0) {
                 continue;
             }
             // get only one condition for drop
             const item = this.rollType(slotItems);
+            this.ctx.logger.debug(`picked item ${item.drop_type}`);
             // get a items for drop
             const itemsForDrop = await this.getItemsForDrop(item, user.id);
             // if no items - get gold
             if (!itemsForDrop) {
-                droppedItems.slots[slotsAvailable] = {
+                droppedItems.slots[slotsAvailable + 1] = {
                     [item.drop_type]: {
                         exchanged: true,
                         exchanged_type: 'money',
@@ -176,11 +182,11 @@ class DropService extends Service {
                 continue;
             }
             // if we have items - attaching it to current object
-            droppedItems.slots[slotsAvailable] = {
+            droppedItems.slots[slotsAvailable + 1] = {
                 [item.drop_type]: this.rollItem(itemsForDrop, item.drop_type, item.min_value, item.max_value, item.rarity)
             };
-        }
 
+        }
         return droppedItems
     }
 
@@ -212,7 +218,7 @@ class DropService extends Service {
 DropService.dropTypes = {
     GOLD: 'gold',
     MONEY: 'money',
-    SKINS: 'skins',
+    SKINS: 'skin',
     PARTS: 'parts',
 };
 

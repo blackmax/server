@@ -12,6 +12,7 @@ module.exports = ({logger}) => {
         dialect: 'mysql',
         operatorsAliases: false,
         timeout: 10000,
+        logging: config.logging,
         pool: {
             max: 5,
             min: 0,
