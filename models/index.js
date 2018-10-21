@@ -11,6 +11,7 @@ module.exports = ({logger}) => {
         host: config.host,
         dialect: 'mysql',
         operatorsAliases: false,
+        timeout: 10000,
         pool: {
             max: 5,
             min: 0,

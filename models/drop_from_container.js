@@ -14,6 +14,9 @@ module.exports = (sequelize, Types) => {
         min_value: INTEGER(11),
         max_value: INTEGER(11),
         rarity: STRING(50),
+    }, {
+        timestamps: false,
+        tableName: 'drop_from_container'
     });
 
     return DropFromContainer;

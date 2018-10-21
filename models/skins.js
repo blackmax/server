@@ -8,6 +8,7 @@ module.exports = (sequelize, {INTEGER, TEXT, STRING, BOOLEAN}) =>
         car_id: INTEGER(10).UNSIGNED,
         type: STRING(10),
         rarity: TEXT,
+        dropable: BOOLEAN
     }, {
         timestamps: false
     });

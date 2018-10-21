@@ -6,3 +6,4 @@ apps:
       env_production:
         NODE_ENV: production
         watch: false
+        "node_args": []

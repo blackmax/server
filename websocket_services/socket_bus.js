@@ -62,9 +62,9 @@ module.exports = (ctx) => {
                 data: parsedData,
             });
         } catch (e) {
-            ctx.logger.error(e.toString());
+            ctx.logger.error({message: e.toString()});
             ctx.socket.emit('_error', e.toString());
-            if(process.env.NODE_ENV !== 'PRODUCTION') {
+            if (process.env.NODE_ENV !== 'PRODUCTION') {
                 throw e;
             }
         }
