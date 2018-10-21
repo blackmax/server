@@ -4,7 +4,8 @@
         "port": "3306",
         "database": "xwt_db",
         "username": "platformer",
-        "password": "w123456"
+        "password": "w123456",
+        "logging": false
     },
     "server": {
         "port": 3080,
