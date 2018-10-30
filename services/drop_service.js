@@ -47,48 +47,33 @@ class DropService extends Service {
      * @param rarity - rarity of dropped item
      * @returns {*}
      */
-    rollItem(items, type, minValue, maxValue, rarity) {
-        switch (type) {
-            case DropService.dropTypes.MONEY:
-                return items;
-            case DropService.dropTypes.GOLD:
-                return items;
-            case DropService.dropTypes.PARTS:
-                const count = this.randomInteger(minValue, maxValue);
-                const partNumber = this.randomInteger(0, items.length);
-                items[partNumber].setDataValue('count', count);
-
-                return items[partNumber];
-                //TODO: добавить проверку параметров юзера для количества запчастей
-                //TODO: добавить выборку случайной запчасти из возможных
-            default:
-                const itemsNeeded = maxValue - minValue;
-                if (itemsNeeded === 0) {
-                    // drop only one item
-                    const itemNumber = Math.random() % items.length;
-                    return [items[itemNumber]];
-                }
-
-                if (items.length < itemsNeeded) {
-                    return items;
-                }
-
-                const droppedItems = [];
-
-                while (droppedItems.length < itemsNeeded) {
-                    const key = this.randomInteger(0, items.length);
-                    if (droppedItems[key]) {
-                        continue;
-                    }
-                    const item = items[key];
-                    const isItemExists = droppedItems.find(element => element.id === item.id);
-                    if (!isItemExists) {
-                        droppedItems.push(item);
-                    }
-                }
-
-                return droppedItems;
+    rollItem(items, minValue, maxValue) {
+        const itemsNeeded = maxValue - minValue;
+        if (itemsNeeded === 0) {
+            // drop only one item
+            const itemNumber = Math.random() % items.length;
+            return [items[itemNumber]];
         }
+
+        if (items.length < itemsNeeded) {
+            return items;
+        }
+
+        const droppedItems = [];
+
+        while (droppedItems.length < itemsNeeded) {
+            const key = this.randomInteger(0, items.length);
+            if (droppedItems[key]) {
+                continue;
+            }
+            const item = items[key];
+            const isItemExists = droppedItems.find(element => element.id === item.id);
+            if (!isItemExists) {
+                droppedItems.push(item);
+            }
+        }
+
+        return droppedItems;
     }
 
     /**
@@ -97,20 +82,67 @@ class DropService extends Service {
      * @param userId - id of user
      * @returns {number|array} - number if gold, array if some model type
      */
-    async getItemsForDrop(criteria, userId) {
-        const {skins, user_skin, user_parts, user_cars, parts, cars} = this.ctx.db;
+    async getItemsForDrop(criteria, user) {
+        const userId = user.id;
+        let userCars;
+        const {skins, user_skin, user_parts, user_icons, user_cars, parts, cars, icons} = this.ctx.db;
         switch (criteria.drop_type) {
             case DropService.dropTypes.MONEY:
-                return this.randomInteger(criteria.min_value, criteria.max_value);
+                const amount = this.randomInteger(criteria.min_value, criteria.max_value);
+                user.addCurrency('money', amount);
+                await user.save();
+                return amount;
+            case DropService.dropTypes.ICONS:
+                const userIcons = await user_icons.findAll({where: {user_id: userId}});
+                const dropableIcons = await icons.findAll({
+                    where: {
+                        id: {[Op.notIn]: userIcons.map(el => el.icon_id)},
+                        dropable: 1,
+                    }
+                });
+
+                if (dropableIcons == null) {
+                    return null;
+                }
+
+                return this.rollItem(dropableIcons, 1, 1);
             case DropService.dropTypes.GOLD:
+                user.addCurrency('gold', amount);
+                await user.save();
                 return this.randomInteger(criteria.min_value, criteria.max_value);
             case DropService.dropTypes.SKINS:
-                const userSkins = await user_skin.findAll({where: {user_id: userId}});
-                return await skins.findAll({
-                    where: {id: {[Op.notIn]: userSkins.map(el => el.skin_id)}, rarity: criteria.rarity}
+                let [userSkins, userCars] = await Promise.all([
+                    user_skin.findAll({where: {user_id: userId}}),
+                    user_cars.findAll({where: {user_id: userId}})
+                ]);
+
+                const availableForDropSkins = await skins.findAll({
+                    where: {
+                        id: {[Op.notIn]: userSkins.map(el => el.skin_id)},
+                        car_id: {[Op.in]: userCars.map(el => el.id)},
+                        rarity: criteria.rarity
+                    }
+
                 });
+                // no available skins for drop
+                if (availableForDropSkins === null) {
+                    return null;
+                }
+                // choose skins from array of skins
+                const droppedSkins = this.rollItem(availableForDropSkins, criteria.min_value, criteria.max_value);
+                // attach skins to user
+                await user_skin.create(droppedSkins.map(element => {
+                    return {
+                        new: 1,
+                        skin_id: element.id,
+                        user_id: userId,
+                        car_id: element.car_id
+                    }
+                }));
+
+                return droppedSkins;
             case DropService.dropTypes.PARTS:
-                const userCars = await user_cars.findAll({where: {user_id: userId}});
+                userCars = await user_cars.findAll({where: {user_id: userId}});
                 const existingCars = await cars.findAll({
                     where: {
                         id: {
@@ -119,7 +151,7 @@ class DropService extends Service {
                     }
                 });
                 const userParts = await user_parts.findAll({where: {user_id: userId}});
-                return await parts.findAll({
+                const items = await parts.findAll({
                     attributes: ["id", "class", "type", "rarity"],
                     where: {
                         id: {
@@ -131,6 +163,21 @@ class DropService extends Service {
                         rarity: criteria.rarity,
                     }
                 });
+
+                const count = this.randomInteger(criteria.min_value, criteria.max_value);
+                const partNumber = this.randomInteger(0, items.length);
+
+                //TODO: добавить проверку параметров юзера для количества запчастей
+                //TODO: добавить выборку случайной запчасти из возможных
+                items[partNumber].setDataValue('count', count);
+                user_parts.create({
+                    user_id: userId,
+                    part_id: items[partNumber].id,
+                    part_lvl: 1,
+                    part_number: count,
+                    new: 1,
+                });
+                return items[partNumber];
 
             default:
                 this.ctx.logger.error(`NO DROP TYPE HANDLER ${criteria.drop_type.toUpperCase()}`);
@@ -148,6 +195,12 @@ class DropService extends Service {
         return 1;
     }
 
+    /**
+     * handle drop for user and attach items to user
+     * @param user
+     * @param containerId
+     * @returns {Promise<{slots: {}}>}
+     */
     async handleDrop(user, containerId) {
         const [container, items] = await Promise.all([
             this.ctx.db.containers_types.find({where: {id: containerId}}),
@@ -183,11 +236,10 @@ class DropService extends Service {
             }
             // if we have items - attaching it to current object
             droppedItems.slots[slotsAvailable + 1] = {
-                [item.drop_type]: this.rollItem(itemsForDrop, item.drop_type, item.min_value, item.max_value, item.rarity)
+                [item.drop_type]: itemsForDrop
             };
-
         }
-        return droppedItems
+        return droppedItems;
     }
 
     isDropExchanged(item) {
@@ -217,6 +269,7 @@ class DropService extends Service {
 
 DropService.dropTypes = {
     GOLD: 'gold',
+    ICONS: 'icon',
     MONEY: 'money',
     SKINS: 'skin',
     PARTS: 'parts',

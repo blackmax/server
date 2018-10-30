@@ -14,7 +14,22 @@ const drop = require('./commands/drop');
 const events = {
     super_event: loginCommand,
     register: registerCommand,
-    user_cars: userCars,
+    //user_cars: userCars,
+    //login_by_service
+    //auth[facebook]
+    //level_finished
+    //level_failed
+    //adv_watched
+    //car_upgraded
+    //car_saved
+    //car_skin_saved
+    //car_disk_saved
+    //car_disk_saved
+    //parts_upgraded
+    //container_purchased
+    //mission_finished
+    //start_container_opening
+    //открыть контейнер за донат
     query,
     profile,
     buy_car,
