@@ -125,7 +125,6 @@ class UserService extends Service {
         if (!icon) {
             return false;
         }
-
         this.user.current_icon = iconId;
 
         return true;
