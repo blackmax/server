@@ -122,6 +122,15 @@ class UserService extends Service {
             where: {icon_id: iconId}
         });
 
+        if(icon == null){
+            return false;
+        }
+
+        if (icon.new) {
+            icon.new = false;
+            icon.save();
+        }
+
         if (!icon) {
             return false;
         }
