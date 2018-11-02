@@ -139,19 +139,22 @@ class UserService extends Service {
         return true;
     }
 
-    async earnAdventureLevel(stars, time, levelId, type) {
+    async earnAdventureLevel(stars, time, level_number, type) {
         //todo: some protection logic
         //пробуем найти уровень в базе - если нету производим запись
-        const userAdvLevel = await this.ctx.db.user_adventure_levels.findOne({where: {user_id: this.user.id, id: levelId}});
-        if(userAdvLevel == null){
+        const userAdvLevel = await this.ctx.db.user_adventure_levels.findOne({
+            where:
+                {user_id: this.user.id, level_number}
+        });
+        if (userAdvLevel == null) {
             const countOfLevels = await this.ctx.db.user_adventure_levels.count({
                 where: {
-                    id: levelId,
+                    level_number,
                     user_id: this.user.id,
                 }
             });
 
-            if(countOfLevels + 1 % 4 == 0){
+            if (countOfLevels + 1 % 4 === 0) {
                 //todo: earn container
             }
 
@@ -159,7 +162,7 @@ class UserService extends Service {
                 user_id: this.user.id,
                 stars,
                 best_time: time,
-                id: levelId,
+                level_number,
                 type,
             });
         }

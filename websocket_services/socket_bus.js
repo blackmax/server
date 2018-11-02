@@ -9,11 +9,14 @@ const add_currency = require('./commands/add_currency');
 const icon_changed = require('./commands/icon_changed');
 const status = require('./commands/status');
 const car_skin_changed = require('./commands/car_skin_changed');
+const levelFinished = require('./commands/adventure_level_finished');
 const drop = require('./commands/drop');
 
 const events = {
     super_event: loginCommand,
     register: registerCommand,
+    //юзер завершил уровень
+    level_finished: levelFinished,
     //user_cars: userCars,
     //login_by_service
     //auth[facebook]
