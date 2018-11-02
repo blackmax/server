@@ -122,7 +122,7 @@ class UserService extends Service {
             where: {icon_id: iconId}
         });
 
-        if(icon == null){
+        if (icon == null) {
             return false;
         }
 
@@ -137,6 +137,39 @@ class UserService extends Service {
         this.user.current_icon = iconId;
 
         return true;
+    }
+
+    async earnAdventureLevel(stars, time, levelId, type) {
+        //todo: some protection logic
+        //пробуем найти уровень в базе - если нету производим запись
+        const userAdvLevel = await this.ctx.db.user_adventure_levels.findOne({where: {user_id: this.user.id, id: levelId}});
+        if(userAdvLevel == null){
+            const countOfLevels = await this.ctx.db.user_adventure_levels.count({
+                where: {
+                    id: levelId,
+                    user_id: this.user.id,
+                }
+            });
+
+            if(countOfLevels + 1 % 4 == 0){
+                //todo: earn container
+            }
+
+            return await this.ctx.db.user_adventure_levels.create({
+                user_id: this.user.id,
+                stars,
+                best_time: time,
+                id: levelId,
+                type,
+            });
+        }
+
+        userAdvLevel.min_time = userAdvLevel.min_time > time ? time : userAdvLevel.min_time;
+        userAdvLevel.stars = userAdvLevel.stars > stars ? userAdvLevel.stars : stars;
+        await userAdvLevel.save();
+
+        return userAdvLevel;
+
     }
 }
 
