@@ -24,7 +24,6 @@ const events = {
     //car_saved
     //car_skin_saved
     //car_disk_saved
-    //car_disk_saved
     //parts_upgraded
     //container_purchased
     //mission_finished
