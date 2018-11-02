@@ -16,7 +16,14 @@ module.exports = async function (ctx) {
     // метод из документации sqilize
     await user.save();
 
+    //user.create();
+    //user.findOne();
+    //user.count();
+    //http://docs.sequelizejs.com/manual/tutorial/models-usage.html
+    //http://docs.sequelizejs.com/manual/tutorial/querying.html
+
     //что бы сообщить пользователю
+    // 1 аргумент - канал, 2 аргумент - данные
     socket.emit('on_example', {
         user: user,
         user_cars: userCars,
