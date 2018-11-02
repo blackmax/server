@@ -19,6 +19,7 @@ module.exports = async function (ctx) {
     //user.create();
     //user.findOne();
     //user.count();
+    //ссылки на доки
     //http://docs.sequelizejs.com/manual/tutorial/models-usage.html
     //http://docs.sequelizejs.com/manual/tutorial/querying.html
 
