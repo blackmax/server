@@ -37,6 +37,10 @@ class UserService extends Service {
 
     }
 
+    getModel(){
+        return this.user;
+    }
+
     setUser(user) {
         this.user = user;
     }
