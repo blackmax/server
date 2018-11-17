@@ -108,6 +108,31 @@ class CarService extends Service {
 
         return true;
     }
+
+    async saveCar(userId, car){
+        const {user_cars} = this.ctx.db;
+        //todo: upgrade validation
+        const upgradedCar = await user_cars.update(car, {
+            where: {
+                user_id: userId,
+                car_id: car.id,
+            }
+        });
+
+        return upgradedCar;
+    }
+
+    async updateCarSkin(userId, carId, skinId){
+        const {user_cars} = this.ctx.db;
+        const upgradedCar = await user_cars.upgrade({skin_id: skinId}, {user_id: userId, car_id: carId});
+        return upgradedCar;
+    }
+
+    async updateCarDisk(userId, carId, diskId){
+        const {user_cars} = this.ctx.db;
+        const upgradedCar = await user_cars.upgrade({disk_id: diskId}, {user_id: userId, car_id: carId});
+        return upgradedCar;
+    }
 }
 
 module.exports = (ctx) => new CarService(ctx);

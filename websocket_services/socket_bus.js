@@ -11,19 +11,19 @@ const status = require('./commands/status');
 const car_skin_changed = require('./commands/car_skin_changed');
 const levelFinished = require('./commands/adventure_level_finished');
 const drop = require('./commands/drop');
+const car_upgrade = require('./commands/car_upgrade');
 
 const events = {
     super_event: loginCommand,
     register: registerCommand,
     //юзер завершил уровень
     level_finished: levelFinished,
-    //user_cars: userCars,
+    user_cars: userCars,
     //login_by_service
     //auth[facebook]
     //level_finished
-    //level_failed
     //adv_watched
-    //car_upgraded
+    car_upgraded: car_upgrade,
     //car_saved
     //car_skin_saved
     //car_disk_saved
