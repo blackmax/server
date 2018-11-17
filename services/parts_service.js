@@ -35,6 +35,7 @@ class PartsService extends Service {
         }
 
         userPart.part_lvl += 1;
+        userPart.new = 0;
         await userPart.save();
 
         return userPart;
