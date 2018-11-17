@@ -1,6 +1,22 @@
 const Service = require('./service');
 
 class CarService extends Service {
+     /**
+     * сколько денег надо на следующий апгрейд
+     * @param from
+     * @param level
+     * @returns {*}
+     */
+     static getUpgradePrice(from, level) {
+        const half = from / 2;
+        let price = from;
+        for (let i = 2; i < level + 1; i++) {
+            price += half + 100 * (i - 2);
+        }
+
+        return price;
+    }
+
     async changeSkin(userId, carId, skinId) {
         const {skins, user_cars, user_skin} = this.ctx.db;
         const skin = await skins.findOne({where: {id: skinId}});
@@ -65,22 +81,6 @@ class CarService extends Service {
         };
     }
 
-    /**
-     * сколько денег надо на следующий апгрейд
-     * @param from
-     * @param level
-     * @returns {*}
-     */
-    getUpgradePrice(from, level) {
-        const half = from / 2;
-        let price = from;
-        for (let i = 2; i < level + 1; i++) {
-            price += half + 100 * (i - 2);
-        }
-
-        return price;
-    }
-
     async upgradeCar(user, carId, type) {
         const {cars, user_cars} = this.ctx.db;
         const [car, userCar] = await Promise.all([
@@ -97,7 +97,7 @@ class CarService extends Service {
             return false;
         }
 
-        const moneyNeeded = this.getUpgradePrice(car.upgrade_price, currLevel);
+        const moneyNeeded = CarService.getUpgradePrice(car.upgrade_price, currLevel);
         if (!user.checkCurrency('money', moneyNeeded) && userCar[type + '_max'] + 1 < 20) {
             return false;
         }
