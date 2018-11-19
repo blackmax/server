@@ -42,3 +42,5 @@ class PartsService extends Service {
 
     }
 }
+
+module.exports = (ctx) => new PartsService(ctx);

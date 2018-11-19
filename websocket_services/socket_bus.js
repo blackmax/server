@@ -24,9 +24,7 @@ const events = {
     //level_finished
     //adv_watched
     car_upgraded: car_upgrade,
-    //car_saved
-    //car_skin_saved
-    //car_disk_saved
+
     //parts_upgraded
     //container_purchased
     //mission_finished
