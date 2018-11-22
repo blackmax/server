@@ -9,7 +9,7 @@ module.exports = (sequelize, {INTEGER, TEXT, STRING, BOOLEAN}) =>
         type: STRING(20),
         stars: INTEGER(4),
         best_time: INTEGER,
-        level_number: INTEGER,
+        level_num: INTEGER,
     }, {
         timestamps: false
     });
