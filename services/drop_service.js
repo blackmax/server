@@ -172,7 +172,7 @@ class DropService extends Service {
 
                 // если у текущей запчасти максимум - даем золото
 
-                if(items[partNumber].part_number == 12){
+                if(items[partNumber].part_number === 12){
                     return false;
                 }
 
@@ -192,7 +192,9 @@ class DropService extends Service {
                     new: 1,
                 });
                 return items[partNumber];
+            case DropService.dropTypes.CARTS:
 
+                break;
             default:
                 this.ctx.logger.error(`NO DROP TYPE HANDLER ${criteria.drop_type.toUpperCase()}`);
                 break;
@@ -288,6 +290,7 @@ DropService.dropTypes = {
     MONEY: 'money',
     SKINS: 'skin',
     PARTS: 'parts',
+    CARTS: 'cars',
 };
 
 module.exports = (ctx) => new DropService(ctx);
