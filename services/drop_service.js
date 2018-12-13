@@ -48,6 +48,7 @@ class DropService extends Service {
      * @returns {*}
      */
     rollItem(items, minValue, maxValue) {
+        this.ctx.logger.debug('rolling items', {items, minValue, maxValue});
         const itemsNeeded = maxValue - minValue;
         if (itemsNeeded === 0) {
             // drop only one item
@@ -72,7 +73,7 @@ class DropService extends Service {
                 droppedItems.push(item);
             }
         }
-
+        this.ctx.debug('items for drop', {droppedItems});
         return droppedItems;
     }
 
@@ -126,10 +127,12 @@ class DropService extends Service {
                 });
                 // no available skins for drop
                 if (availableForDropSkins === null) {
-                    return null;
+                    return false;
                 }
+                this.ctx.logger.debug('criteria', {criteria});
                 // choose skins from array of skins
                 const droppedSkins = this.rollItem(availableForDropSkins, criteria.min_value, criteria.max_value);
+                this.ctx.logger.debug('dropped skings', {droppedSkins});
                 // attach skins to user
                 await user_skin.create(droppedSkins.map(element => {
                     return {
