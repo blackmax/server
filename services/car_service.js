@@ -1,13 +1,13 @@
 const Service = require('./service');
 
 class CarService extends Service {
-     /**
+    /**
      * сколько денег надо на следующий апгрейд
      * @param from
      * @param level
      * @returns {*}
      */
-     static getUpgradePrice(from, level) {
+    static getUpgradePrice(from, level) {
         const half = from / 2;
         let price = from;
         for (let i = 2; i < level + 1; i++) {
@@ -41,14 +41,7 @@ class CarService extends Service {
         Promise.all([userCarsUpdate, userSkinUpdate]);
     }
 
-    // Покупка машины
-    async buyCar(user, carId) {
-        const car = await this.ctx.db.cars.findOne({where: {id: carId}});
-
-        // Проверка (есть ли у игрока столько денег?)
-        if (!user.checkCurrency("money", car.price)) {
-            throw "NOT_ENOUGH_CURRENCY";
-        }
+    async attachCarToUser(user, carId) {
         //получаем базовый скин машины
         const carSkinPromise = this.ctx.db.skins.find({
             where: {car_id: carId, type: 'body'},
@@ -60,19 +53,34 @@ class CarService extends Service {
             order: [['id', 'asc']],
         });
         const [carSkin, diskSkin] = await Promise.all([carSkinPromise, diskSkinPromise]);
-        user.addCurrency('money', car.price * -1);
+
         const userSkins = await this.ctx.db.user_skin.create([{user_id: user.id, skin_id: carSkin.id}, {
             user_id: user.id,
             skin_id: diskSkin.skin_id
         }]);
+
+        return this.ctx.db.user_cars.create({
+            user_id: user.id,
+            car_id: carId,
+            skin_id: carSkin.id,
+            disk_id: diskSkin.id,
+        });
+    }
+
+    // Покупка машины
+    async buyCar(user, carId) {
+        const car = await this.ctx.db.cars.findOne({where: {id: carId}});
+
+        // Проверка (есть ли у игрока столько денег?)
+        if (!user.checkCurrency("money", car.price)) {
+            throw "NOT_ENOUGH_CURRENCY";
+        }
+
+        user.addCurrency('money', car.price * -1);
+
         // Создаем запись о машине
         const [userCars] = await Promise.all([
-            this.ctx.db.user_cars.create({
-                user_id: user.id,
-                car_id: carId,
-                skin_id: carSkin.id,
-                disk_id: diskSkin.id,
-            }),
+            this.attachCarToUser(user, carId),
             user.save(),
         ]);
         return {
@@ -109,7 +117,7 @@ class CarService extends Service {
         return true;
     }
 
-    async saveCar(userId, car){
+    async saveCar(userId, car) {
         const {user_cars} = this.ctx.db;
         //todo: upgrade validation
         const upgradedCar = await user_cars.update(car, {

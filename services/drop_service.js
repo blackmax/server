@@ -84,7 +84,7 @@ class DropService extends Service {
      */
     async getItemsForDrop(criteria, user) {
         const userId = user.id;
-        let userCars;
+        let userCars, existingCars;
         const {skins, user_skin, user_parts, user_icons, user_cars, parts, cars, icons} = this.ctx.db;
         switch (criteria.drop_type) {
             case DropService.dropTypes.MONEY:
@@ -143,7 +143,7 @@ class DropService extends Service {
                 return droppedSkins;
             case DropService.dropTypes.PARTS:
                 userCars = await user_cars.findAll({where: {user_id: userId}});
-                const existingCars = await cars.findAll({
+                existingCars = await cars.findAll({
                     where: {
                         id: {
                             [Op.in]: userCars.map(element => element.car_id)
@@ -172,12 +172,12 @@ class DropService extends Service {
 
                 // если у текущей запчасти максимум - даем золото
 
-                if(items[partNumber].part_number === 12){
+                if (items[partNumber].part_number === 12) {
                     return false;
                 }
 
                 //если итемов больше максимума возвращаем остаток
-                if(droppedCount + items[partNumber].part_number > 12){
+                if (droppedCount + items[partNumber].part_number > 12) {
                     droppedCount = 12 - items[partNumber].part_number;
                 }
 
@@ -192,9 +192,23 @@ class DropService extends Service {
                     new: 1,
                 });
                 return items[partNumber];
-            case DropService.dropTypes.CARTS:
+            case DropService.dropTypes.CARS:
+                // получаем все машины которые можно дробнуть
+                userCars = await user_cars.findAll({where: {user_id: userId}});
+                const carsAvailableForDrop = await cars.findAll({
+                    where: {
+                        id: {
+                            [Op.notIn]: userCars.map(element => element.car_id)
+                        }
+                    }
+                });
+                const carNumber = this.randomInteger(0, carsAvailableForDrop.length);
 
-                break;
+                const droppedCar = carsAvailableForDrop[carNumber];
+
+                const userCar = await this.ctx.services.user_cars.attachCarToUser(user, carId);
+
+                return droppedCar;
             default:
                 this.ctx.logger.error(`NO DROP TYPE HANDLER ${criteria.drop_type.toUpperCase()}`);
                 break;
@@ -290,7 +304,7 @@ DropService.dropTypes = {
     MONEY: 'money',
     SKINS: 'skin',
     PARTS: 'parts',
-    CARTS: 'cars',
+    CARS: 'cars',
 };
 
 module.exports = (ctx) => new DropService(ctx);

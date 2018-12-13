@@ -78,6 +78,5 @@ module.exports = (sequelize, Types) => {
         return this;
     };
 
-
     return User;
 };
