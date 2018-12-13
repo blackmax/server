@@ -151,6 +151,8 @@ class DropService extends Service {
                     }
                 });
                 const userParts = await user_parts.findAll({where: {user_id: userId}});
+
+                // выбираем запчасти которых нет у юзера
                 const items = await parts.findAll({
                     attributes: ["id", "class", "type", "rarity"],
                     where: {
@@ -164,17 +166,29 @@ class DropService extends Service {
                     }
                 });
 
-                const count = this.randomInteger(criteria.min_value, criteria.max_value);
+                let droppedCount = this.randomInteger(criteria.min_value, criteria.max_value);
                 const partNumber = this.randomInteger(0, items.length);
 
-                //TODO: добавить проверку параметров юзера для количества запчастей
-                //TODO: добавить выборку случайной запчасти из возможных
-                items[partNumber].setDataValue('count', count);
+
+                // если у текущей запчасти максимум - даем золото
+
+                if(items[partNumber].part_number == 12){
+                    return false;
+                }
+
+                //если итемов больше максимума возвращаем остаток
+                if(droppedCount + items[partNumber].part_number > 12){
+                    droppedCount = 12 - items[partNumber].part_number;
+                }
+
+
+                items[partNumber].setDataValue('count', droppedCount);
+
                 user_parts.create({
                     user_id: userId,
                     part_id: items[partNumber].id,
                     part_lvl: 1,
-                    part_number: count,
+                    part_number: droppedCount,
                     new: 1,
                 });
                 return items[partNumber];
@@ -202,28 +216,29 @@ class DropService extends Service {
      * @returns {Promise<{slots: {}}>}
      */
     async handleDrop(user, containerId) {
+        // получение контейнеров и типов дропа с него
         const [container, items] = await Promise.all([
             this.ctx.db.containers_types.find({where: {id: containerId}}),
             this.ctx.db.drop_from_container.findAll({where: {container_id: containerId}}),
         ]);
         let slotsAvailable = container.slots;
         let droppedItems = {slots: {}};
+        //  обработка дропа для слотов
         while (slotsAvailable > 0) {
             this.ctx.logger.debug(`handling drop for slot ${slotsAvailable}`);
-            // get the conditions for current slot
+            // итемы которые можно дропнуть в текущем слоте
             const slotItems = items.filter(item => item.slot_number === slotsAvailable);
-
             slotsAvailable -= 1;
             this.ctx.logger.debug('rolling items', {items: slotItems.map(element => element.drop_type + " " + element.chance)});
             if (slotItems.length === 0) {
                 continue;
             }
-            // get only one condition for drop
+            // Выбираем тип итема, который будет в слоте
             const item = this.rollType(slotItems);
             this.ctx.logger.debug(`picked item ${item.drop_type}`);
-            // get a items for drop
+            // получаем итемы по слоту
             const itemsForDrop = await this.getItemsForDrop(item, user.id);
-            // if no items - get gold
+            // если нет возможности дропнуть итем обмениваем на золото
             if (!itemsForDrop) {
                 droppedItems.slots[slotsAvailable + 1] = {
                     [item.drop_type]: {
@@ -234,7 +249,7 @@ class DropService extends Service {
                 };
                 continue;
             }
-            // if we have items - attaching it to current object
+            // добавляем итемы к результату
             droppedItems.slots[slotsAvailable + 1] = {
                 [item.drop_type]: itemsForDrop
             };
