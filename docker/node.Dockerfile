@@ -9,6 +9,6 @@ COPY . .
 CMD ls
 CMD rm -fRv node_modules && npm cache verify && npm install && npm ls&& npm audit
 
-EXPOSE 3000 3080 9229
+EXPOSE 3000 3080 9229 9232
 
 CMD npm install && ./node_modules/.bin/pm2-runtime process.yml

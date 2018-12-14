@@ -47,12 +47,11 @@ class DropService extends Service {
      * @param rarity - rarity of dropped item
      * @returns {*}
      */
-    rollItem(items, minValue, maxValue) {
-        this.ctx.logger.debug('rolling items', {items, minValue, maxValue});
+    rollItem(items, minValue = 1, maxValue = 1) {
         const itemsNeeded = maxValue - minValue;
         if (itemsNeeded === 0) {
             // drop only one item
-            const itemNumber = Math.random() % items.length;
+            const itemNumber = this.randomInteger(0, items.length);
             return [items[itemNumber]];
         }
 
@@ -85,11 +84,11 @@ class DropService extends Service {
      */
     async getItemsForDrop(criteria, user) {
         const userId = user.id;
-        let userCars, existingCars;
+        let userCars, existingCars, amount;
         const {skins, user_skin, user_parts, user_icons, user_cars, parts, cars, icons} = this.ctx.db;
         switch (criteria.drop_type) {
             case DropService.dropTypes.MONEY:
-                const amount = this.randomInteger(criteria.min_value, criteria.max_value);
+                amount = this.randomInteger(criteria.min_value, criteria.max_value);
                 user.addCurrency('money', amount);
                 await user.save();
                 return amount;
@@ -103,11 +102,12 @@ class DropService extends Service {
                 });
 
                 if (dropableIcons == null) {
-                    return null;
+                    return false;
                 }
 
                 return this.rollItem(dropableIcons, 1, 1);
             case DropService.dropTypes.GOLD:
+                amount = this.randomInteger(criteria.min_value, criteria.max_value);
                 user.addCurrency('gold', amount);
                 await user.save();
                 return this.randomInteger(criteria.min_value, criteria.max_value);
@@ -126,25 +126,29 @@ class DropService extends Service {
 
                 });
                 // no available skins for drop
-                if (availableForDropSkins === null) {
+                if (availableForDropSkins.length === 0) {
                     return false;
                 }
-                this.ctx.logger.debug('criteria', {criteria});
                 // choose skins from array of skins
                 const droppedSkins = this.rollItem(availableForDropSkins, criteria.min_value, criteria.max_value);
-                this.ctx.logger.debug('dropped skings', {droppedSkins});
                 // attach skins to user
-                await user_skin.create(droppedSkins.map(element => {
-                    return {
-                        new: 1,
-                        skin_id: element.id,
-                        user_id: userId,
-                        car_id: element.car_id
+                droppedSkins.forEach( async (element) => {
+                    try {
+                        await user_skin.create({
+                            new: 1,
+                            skin_id: element.id,
+                            user_id: userId,
+                            car_id: element.car_id,
+                        });
+                    } catch (e) {
+                        console.log(e);
                     }
-                }));
+
+                });
 
                 return droppedSkins;
             case DropService.dropTypes.PARTS:
+                return false;
                 userCars = await user_cars.findAll({where: {user_id: userId}});
                 existingCars = await cars.findAll({
                     where: {
@@ -244,19 +248,16 @@ class DropService extends Service {
         let droppedItems = {slots: {}};
         //  обработка дропа для слотов
         while (slotsAvailable > 0) {
-            this.ctx.logger.debug(`handling drop for slot ${slotsAvailable}`);
             // итемы которые можно дропнуть в текущем слоте
             const slotItems = items.filter(item => item.slot_number === slotsAvailable);
             slotsAvailable -= 1;
-            this.ctx.logger.debug('rolling items', {items: slotItems.map(element => element.drop_type + " " + element.chance)});
             if (slotItems.length === 0) {
                 continue;
             }
             // Выбираем тип итема, который будет в слоте
             const item = this.rollType(slotItems);
-            this.ctx.logger.debug(`picked item ${item.drop_type}`);
             // получаем итемы по слоту
-            const itemsForDrop = await this.getItemsForDrop(item, user.id);
+            const itemsForDrop = await this.getItemsForDrop(item, user);
             // если нет возможности дропнуть итем обмениваем на золото
             if (!itemsForDrop) {
                 droppedItems.slots[slotsAvailable + 1] = {
@@ -274,30 +275,6 @@ class DropService extends Service {
             };
         }
         return droppedItems;
-    }
-
-    isDropExchanged(item) {
-        return item.exchanged;
-    }
-
-    attachDropToUser(user, drop) {
-        Object.keys(drop).forEach(key => {
-            const slotDrop = drop[key];
-            Object.keys(slotDrop).forEach(slotDropKey => {
-                const value = slotDrop[slotDropKey];
-                if (this.isDropExchanged(value)) {
-
-                }
-                switch (slotDropKey) {
-                    case DropService.dropTypes.GOLD:
-                        user.gold += value;
-                        break;
-                    case DropService.dropTypes.MONEY:
-                        user.money += value;
-                        break;
-                }
-            })
-        });
     }
 }
 
