@@ -274,6 +274,7 @@ class DropService extends Service {
                 [item.drop_type]: itemsForDrop
             };
         }
+        this.ctx.logger.info('user have drop', {action: 'user', user_id: user.id, items: droppedItems});
         return droppedItems;
     }
 }
