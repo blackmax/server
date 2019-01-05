@@ -1,10 +1,14 @@
 const Service = require('./service');
-const {Op} = require('sequelize');
+const { Op } = require('sequelize');
 
 class ContainerService extends Service {
 
-    getContainers(user) {
-        return this.ctx.db.containers.findOne({where: {user_id: user.id}});
+    async getContainers(user) {
+        return this.ctx.db.containers.findOne({ where: { user_id: user.id } });
+    }
+
+    async subTimeFromFristSlot(user, seconds) {
+        return this.subTimeFromFristSlot(user, 0, seconds);
     }
 
     async subTimeFromSlot(user, slot, seconds) {
@@ -15,7 +19,6 @@ class ContainerService extends Service {
         }
 
         const slotsInfo = JSON.parse(userContainer.current);
-
 
         const openDate = new Date(slotsInfo[slot - 1].time);
 
@@ -46,8 +49,22 @@ class ContainerService extends Service {
         return this.ctx.drop_service.handleDrop(user, slotsInfo[slot - 1].container_id);
     }
 
-    async setContainer(){
-        
+    isContainerPossibleToOpen(container){
+        return (new Date()).getTime() > container.time
+    }
+
+    async dropPossibleContainers(user) {
+        const uContainers = await this.getContainers(user);
+        // дропать нечего
+        if (uContainers == null) {
+            return true;
+        }
+
+        const slots = JSON.parse(uContainers.current);
+
+        return slots
+        .filter(el => this.isContainerPossibleToOpen(el))
+        .map(el => this.ctx.drop_service);
     }
 
 }
