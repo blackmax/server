@@ -49,7 +49,7 @@ class ContainerService extends Service {
         return this.ctx.drop_service.handleDrop(user, slotsInfo[slot - 1].container_id);
     }
 
-    isContainerPossibleToOpen(container){
+    isContainerPossibleToOpen(container) {
         return (new Date()).getTime() > container.time
     }
 
@@ -63,8 +63,10 @@ class ContainerService extends Service {
         const slots = JSON.parse(uContainers.current);
 
         return slots
-        .filter(el => this.isContainerPossibleToOpen(el))
-        .map(el => this.ctx.drop_service);
+            .filter(el => this.isContainerPossibleToOpen(el))
+            .map(el => this.ctx.drop_service);
     }
 
 }
+
+module.exports = (ctx) => new ContainerService(ctx);

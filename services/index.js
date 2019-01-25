@@ -5,5 +5,4 @@ module.exports = (ctx) => ({
     drop_service: require('./drop_service')(ctx),
     parts_service: require('./parts_service')(ctx),
     container_service: require('./container_service')(ctx),
-    adv_service: require('./adv_service')(ctx),
 });
