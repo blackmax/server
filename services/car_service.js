@@ -66,20 +66,17 @@ class CarService extends Service {
             skin_id: carSkin.id,
             disk_id: diskSkin.id,
         });
-
-        return {
-            userSkins, userCar
-        }
+        return {userCar, userSkins}
     }
 
     // Покупка машины
     async buyCar(user, carId) {
-        const [car, userCar] = await Promise.all([
+        const [car, isUserHaveCar] = await Promise.all([
             this.ctx.db.cars.findOne({where: {id: carId}}),
             this.ctx.db.user_cars.findOne({where:{user_id: user.id, car_id: carId}}),
         ]);
 
-        if(userCar !== null){
+        if(isUserHaveCar !== null){
             throw "ALREADY_HAVE_CAR";
         }
     
@@ -91,7 +88,7 @@ class CarService extends Service {
         user.addCurrency('money', car.price * -1);
 
         // Создаем запись о машине
-        const {userCars, userSkins} = await Promise.all([
+        const [{userCar, userSkins}] = await Promise.all([
             this.attachCarToUser(user, carId),
             user.save(),
         ]);
