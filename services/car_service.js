@@ -54,10 +54,11 @@ class CarService extends Service {
         });
         const [carSkin, diskSkin] = await Promise.all([carSkinPromise, diskSkinPromise]);
 
-        const userSkins = await this.ctx.db.user_skin.create([{user_id: user.id, skin_id: carSkin.id}, {
-            user_id: user.id,
-            skin_id: diskSkin.skin_id
-        }]);
+        const userSkins =
+            await Promise.all([
+                this.ctx.db.user_skin.create({user_id: user.id, skin_id: carSkin.id}), 
+                this.ctx.db.user_skin.create({user_id: user.id,skin_id: diskSkin.skin_id}),
+            ]);
 
         return this.ctx.db.user_cars.create({
             user_id: user.id,

@@ -1,7 +1,7 @@
 apps:
     - script: server.js
       watch: ["**/**.js", "**.js"]
-      node_args : ["--inspect", "--inspect-port=9232", "--inspect-brk=0.0.0.0"]
+      #node_args : ["--inspect", "--inspect-port=9232", "--inspect-brk=0.0.0.0"]
       env:
         NODE_ENV: development
         
