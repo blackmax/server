@@ -82,7 +82,7 @@ class CarService extends Service {
         if(userCar !== null){
             throw "ALREADY_HAVE_CAR";
         }
-
+    
         // Проверка (есть ли у игрока столько денег?)
         if (!user.checkCurrency("money", car.price)) {
             throw "NOT_ENOUGH_CURRENCY";
