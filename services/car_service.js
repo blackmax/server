@@ -74,7 +74,14 @@ class CarService extends Service {
 
     // Покупка машины
     async buyCar(user, carId) {
-        const car = await this.ctx.db.cars.findOne({where: {id: carId}});
+        const [car, userCar] = await Promise.all([
+            this.ctx.db.cars.findOne({where: {id: carId}}),
+            this.ctx.db.user_cars.findOne({where:{user_id: user.id, car_id: carId}}),
+        ]);
+
+        if(userCar !== null){
+            throw "ALREADY_HAVE_CAR";
+        }
 
         // Проверка (есть ли у игрока столько денег?)
         if (!user.checkCurrency("money", car.price)) {
