@@ -89,7 +89,7 @@ class CarService extends Service {
             user.save(),
         ]);
         return {
-            user_cars: [userCars],
+            user_car: userCar,
             user_skin: userSkins,
         };
     }
