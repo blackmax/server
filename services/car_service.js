@@ -53,19 +53,23 @@ class CarService extends Service {
             order: [['id', 'asc']],
         });
         const [carSkin, diskSkin] = await Promise.all([carSkinPromise, diskSkinPromise]);
-
+        console.log({user_id: user.id, skin_id: carSkin.id, car_id: carId},{user_id: user.id, skin_id: diskSkin.id, car_id: carId} );
+        
         const userSkins =
             await Promise.all([
-                this.ctx.db.user_skin.create({user_id: user.id, skin_id: carSkin.id}), 
-                this.ctx.db.user_skin.create({user_id: user.id,skin_id: diskSkin.skin_id}),
+                this.ctx.db.user_skin.create({user_id: user.id, skin_id: carSkin.id, car_id: carId, new: 1}), 
+                this.ctx.db.user_skin.create({user_id: user.id, skin_id: diskSkin.id, car_id: carId, new: 1}),
             ]);
-
-        return this.ctx.db.user_cars.create({
+        const userCar = await this.ctx.db.user_cars.create({
             user_id: user.id,
             car_id: carId,
             skin_id: carSkin.id,
             disk_id: diskSkin.id,
         });
+
+        return {
+            userSkins, userCar
+        }
     }
 
     // Покупка машины
@@ -80,7 +84,7 @@ class CarService extends Service {
         user.addCurrency('money', car.price * -1);
 
         // Создаем запись о машине
-        const [userCars] = await Promise.all([
+        const {userCars, userSkins} = await Promise.all([
             this.attachCarToUser(user, carId),
             user.save(),
         ]);

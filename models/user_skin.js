@@ -5,7 +5,9 @@ module.exports = (sequelize, {INTEGER, TEXT, STRING, BOOLEAN}) =>
             primaryKey: true,
             autoIncrement: true,
         },
-        user_id: INTEGER(10).UNSIGNED,
+        user_id: {
+            type: INTEGER(10).UNSIGNED,
+        },
         car_id: INTEGER(10).UNSIGNED,
         skin_id: INTEGER(10).UNSIGNED,
         new: BOOLEAN,

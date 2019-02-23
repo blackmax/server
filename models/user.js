@@ -44,7 +44,7 @@ module.exports = (sequelize, Types) => {
     User.hasMany(UserCars(sequelize, Types), {foreignKey: 'user_id'});
     User.hasMany(UserIcons(sequelize, Types), {foreignKey: 'user_id'});
     User.hasMany(UserParts(sequelize, Types), {foreignKey: 'user_id'});
-    User.hasMany(UserSkins(sequelize, Types), {foreignKey: 'user_id'});
+    User.hasMany(UserSkins(sequelize, Types), {foreignKey: 'user_id', localKey: 'id', unique: false});
 
 
     User.prototype.checkCurrency = function (type, price) {
