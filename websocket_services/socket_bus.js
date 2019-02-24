@@ -80,12 +80,8 @@ module.exports = (ctx) => {
             if(result === undefined){
                 return true;
             }
-
-            if(result.errors !== undefined){
-                ctx.socket.emit(key, {success: false, ...result});
-            }
-        
-            ctx.socket.emit(key, {success: true, ...result});
+            
+            ctx.socket.emit(key, {success: !result.hasOwnProperty('errors'), ...result});
 
         } catch (e) {
             ctx.logger.error({message: e.toString()});
