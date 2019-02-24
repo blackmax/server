@@ -70,12 +70,23 @@ module.exports = (ctx) => {
                 await ctx.services.user.loadUserByToken(parsedData.token);
             }
 
-            await events[key]({
+            const result = await events[key]({
                 ...ctx,
                 action: key,
                 events,
                 data: parsedData,
             });
+
+            if(result === undefined){
+                return true;
+            }
+
+            if(result.errors !== undefined){
+                ctx.socket.emit(key, {success: false, ...result});
+            }
+        
+            ctx.socket.emit(key, {success: true, ...result});
+
         } catch (e) {
             ctx.logger.error({message: e.toString()});
             ctx.socket.emit('_error', e.toString());

@@ -77,12 +77,16 @@ class CarService extends Service {
         ]);
 
         if(isUserHaveCar !== null){
-            throw "ALREADY_HAVE_CAR";
+            return {
+                errors: ["ALREADY_HAVE_CAR"]
+            }
         }
     
         // Проверка (есть ли у игрока столько денег?)
         if (!user.checkCurrency("money", car.price)) {
-            throw "NOT_ENOUGH_CURRENCY";
+            return {
+                errors: ["NOT_ENOUGH_CURRENCY"],
+            }
         }
 
         user.addCurrency('money', car.price * -1);
